@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "씻기순서",
+    title: "씼어보까?",
   },
 };
 

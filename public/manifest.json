@@ -1,6 +1,6 @@
 {
   "name": "오늘은 어디부터 씻지?",
-  "short_name": "씻기순서",
+  "short_name": "씼어보까?",
   "description": "오늘의 씻기 순서를 룰렛으로 결정해요",
   "start_url": "/",
   "display": "standalone",

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   ElementId, loadMyOrder, loadScores, getRanking, orderKey, WASH_ELEMENTS,
 } from "@/lib/wash";
+import { apiGetRankings } from "@/lib/api";
 import { Kaechi, WASH_CHAR } from "@/components/Kaechi";
 import Image from "next/image";
 
@@ -20,10 +21,23 @@ export default function BuildingPage() {
     const my = loadMyOrder();
     if (!my) { router.replace("/setup"); return; }
     setMyOrder(my);
-    const scores = loadScores();
-    const ranked = getRanking(scores);
-    setRanking(ranked);
-    if (orderKey(ranked[0].order) === orderKey(my)) setShowReward(true);
+
+    // 서버 랭킹 우선, 실패 시 로컬 fallback
+    apiGetRankings().then(serverRankings => {
+      if (serverRankings.length > 0) {
+        const ranked = serverRankings.map(r => ({
+          order: r.order as ElementId[],
+          score: r.score,
+        }));
+        setRanking(ranked);
+        if (orderKey(ranked[0].order) === orderKey(my)) setShowReward(true);
+      }
+    }).catch(() => {
+      const scores = loadScores();
+      const ranked = getRanking(scores);
+      setRanking(ranked);
+      if (orderKey(ranked[0].order) === orderKey(my)) setShowReward(true);
+    });
   }, [router]);
 
   useEffect(() => {

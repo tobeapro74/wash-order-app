@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ElementId, loadMyOrder, getTodayOrder, vote, markVotedToday,
-  hasVotedToday, WASH_ELEMENTS, DISLIKE_REASONS, randomCopy,
+  hasVotedToday, WASH_ELEMENTS, DISLIKE_REASONS, randomCopy, orderKey,
 } from "@/lib/wash";
+import { apiVote, apiGetTodayOrder } from "@/lib/api";
 import { RouletteWheel } from "@/components/RouletteWheel";
 import { Kaechi, WASH_CHAR } from "@/components/Kaechi";
 import Image from "next/image";
@@ -76,6 +77,7 @@ export default function TodayPage() {
     if (!resultOrder) return;
     vote(resultOrder, true);
     markVotedToday();
+    apiVote(orderKey(resultOrder), true); // 서버 투표
     setPhase("voted");
   };
 
@@ -83,6 +85,7 @@ export default function TodayPage() {
     if (!resultOrder) return;
     vote(resultOrder, false);
     markVotedToday();
+    apiVote(orderKey(resultOrder), false); // 서버 투표
     setShowDislike(false);
     setPhase("voted");
   };

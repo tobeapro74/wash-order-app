@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { WASH_ELEMENTS, ElementId, saveMyOrder, loadMyOrder } from "@/lib/wash";
+import { apiSaveMyOrder, apiGetMyOrder } from "@/lib/api";
 
 import { Kaechi, WASH_CHAR } from "@/components/Kaechi";
 import Image from "next/image";
@@ -56,7 +57,17 @@ export default function SetupPage() {
   const [selected, setSelected] = useState<ElementId[]>([]);
 
   useEffect(() => {
-    setMyOrder(loadMyOrder());
+    // 로컬 먼저, 없으면 서버에서 조회
+    const local = loadMyOrder();
+    if (local) { setMyOrder(local); return; }
+    apiGetMyOrder().then(remote => {
+      if (remote) {
+        saveMyOrder(remote as ElementId[]);
+        setMyOrder(remote as ElementId[]);
+      } else {
+        setMyOrder(null);
+      }
+    }).catch(() => setMyOrder(null));
   }, []);
 
   // 이미 순서가 있으면 확인 화면
@@ -117,6 +128,7 @@ export default function SetupPage() {
     const next = [...selected, id];
     if (next.length === 4) {
       saveMyOrder(next);
+      apiSaveMyOrder(next); // 서버 저장 (비동기, 실패해도 로컬은 유지)
       router.push("/today");
     } else {
       setSelected(next);

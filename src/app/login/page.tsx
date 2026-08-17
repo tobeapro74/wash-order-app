@@ -1,77 +1,99 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { initKakao, loadUser } from "@/lib/auth";
+import { loadUser, saveUser } from "@/lib/auth";
 import { Kaechi } from "@/components/Kaechi";
+
+const KAKAO_JS_KEY = "8cefe9fe0a51a3cb8f0b0f23cbb7e18d";
+
+type KakaoSDK = {
+  isInitialized: () => boolean;
+  init: (key: string) => void;
+  Auth: {
+    login: (opts: {
+      success: (res: { access_token: string }) => void;
+      fail: (err: unknown) => void;
+    }) => void;
+  };
+  API: {
+    request: (opts: {
+      url: string;
+      success: (res: {
+        id: number;
+        kakao_account?: {
+          profile?: { nickname?: string; profile_image_url?: string };
+        };
+      }) => void;
+      fail: (err: unknown) => void;
+    }) => void;
+  };
+};
+
+function getKakao(): KakaoSDK | null {
+  return (window as unknown as { Kakao?: KakaoSDK }).Kakao ?? null;
+}
+
+function loadKakaoSDK(): Promise<void> {
+  return new Promise((resolve) => {
+    const existing = document.getElementById("kakao-sdk");
+    if (existing) { resolve(); return; }
+    const script = document.createElement("script");
+    script.id = "kakao-sdk";
+    script.src = "https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js";
+    script.crossOrigin = "anonymous";
+    script.onload = () => resolve();
+    document.head.appendChild(script);
+  });
+}
 
 export default function LoginPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // 이미 로그인된 경우 스킵
-    const user = loadUser();
-    if (user) {
-      router.replace("/today");
-      return;
-    }
-    initKakao();
+    if (loadUser()) { router.replace("/today"); return; }
+    loadKakaoSDK().then(() => {
+      const kakao = getKakao();
+      if (kakao && !kakao.isInitialized()) kakao.init(KAKAO_JS_KEY);
+    });
   }, [router]);
 
-  const handleKakaoLogin = () => {
-    const w = window as unknown as {
-      Kakao?: {
-        Auth?: {
-          login: (opts: {
-            success: (res: { access_token: string }) => void;
-            fail: (err: unknown) => void;
-          }) => void;
-        };
-        API?: {
-          request: (opts: {
-            url: string;
-            success: (res: { id: number; kakao_account?: { profile?: { nickname?: string; profile_image_url?: string } } }) => void;
-            fail: (err: unknown) => void;
-          }) => void;
-        };
-      };
-    };
+  const handleKakaoLogin = async () => {
+    setLoading(true);
+    await loadKakaoSDK();
+    const kakao = getKakao();
+    if (!kakao) { alert("카카오 SDK 로드 실패. 새로고침 후 시도해주세요."); setLoading(false); return; }
+    if (!kakao.isInitialized()) kakao.init(KAKAO_JS_KEY);
 
-    if (!w.Kakao?.Auth) {
-      alert("카카오 SDK 로딩 중입니다. 잠시 후 다시 시도해주세요.");
-      return;
-    }
-
-    w.Kakao.Auth.login({
+    kakao.Auth.login({
       success: () => {
-        w.Kakao!.API!.request({
+        kakao.API.request({
           url: "/v2/user/me",
           success: (res) => {
             const kakaoId = String(res.id);
             const nickname = res.kakao_account?.profile?.nickname ?? "";
             const profileImage = res.kakao_account?.profile?.profile_image_url;
-
-            // 닉네임이 있으면 바로 저장, 없으면 닉네임 입력 페이지로
             if (nickname) {
-              import("@/lib/auth").then(({ saveUser }) => {
-                saveUser({ kakaoId, nickname, profileImage });
-                router.replace("/today");
-              });
+              saveUser({ kakaoId, nickname, profileImage });
+              router.replace("/today");
             } else {
-              // kakaoId만 임시 저장 후 닉네임 입력으로
               sessionStorage.setItem("pending_kakao_id", kakaoId);
               if (profileImage) sessionStorage.setItem("pending_profile_image", profileImage);
               router.push("/nickname");
             }
+            setLoading(false);
           },
           fail: (err) => {
-            console.error("카카오 사용자 정보 실패", err);
+            console.error("사용자 정보 실패", err);
             alert("로그인 중 오류가 발생했어요.");
+            setLoading(false);
           },
         });
       },
       fail: (err) => {
         console.error("카카오 로그인 실패", err);
+        setLoading(false);
       },
     });
   };

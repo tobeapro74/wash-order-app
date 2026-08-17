@@ -23,8 +23,8 @@ function KakaoCallback() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ code }),
         });
-        if (!res.ok) throw new Error("토큰 교환 실패");
         const data = await res.json();
+        if (!res.ok) throw new Error(`토큰 교환 실패 (${res.status}): ${JSON.stringify(data)}`);
 
         const kakaoId: string = data.id;
         const nickname: string = data.nickname ?? "";
@@ -40,7 +40,7 @@ function KakaoCallback() {
         }
       } catch (e) {
         console.error(e);
-        setError("로그인 처리 중 오류가 발생했습니다.");
+        setError(`오류: ${e instanceof Error ? e.message : String(e)}`);
       }
     })();
   }, [searchParams, router]);

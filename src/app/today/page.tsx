@@ -105,7 +105,7 @@ export default function TodayPage() {
           {/* 타이틀 — 이미지처럼 초대형 Extra Bold */}
           <h1 className="text-center"
             style={{
-              fontSize: 40,
+              fontSize: 39,
               fontWeight: 900,
               color: "#1E2A22",
               letterSpacing: "-1px",

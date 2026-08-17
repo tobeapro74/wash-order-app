@@ -97,17 +97,23 @@ export default function TodayPage() {
         <div className="flex-1 flex flex-col items-center px-5 pb-28"
           style={{ paddingTop: 56 }}>
 
-          {/* 마스코트 80×80 (지팡이/마법사 버전 = char-main) */}
-          <div style={{ marginBottom: 12 }}>
-            <Kaechi mood="normal" size={80} />
+          {/* 마스코트 — 이미지 목표: 보라 로브+지팡이, 현재 에셋 기준 크게 */}
+          <div style={{ marginBottom: 8 }}>
+            <Kaechi mood="normal" size={120} />
           </div>
 
-          {/* 타이틀 */}
-          <h1 className="font-bold text-center"
-            style={{ fontSize: 26, color: "#1E2A22", letterSpacing: "-0.2px", lineHeight: 1.2 }}>
+          {/* 타이틀 — 이미지처럼 초대형 Extra Bold */}
+          <h1 className="text-center"
+            style={{
+              fontSize: 40,
+              fontWeight: 900,
+              color: "#1E2A22",
+              letterSpacing: "-1px",
+              lineHeight: 1.1,
+            }}>
             오늘의 씻기 순서
           </h1>
-          <p className="text-center mt-1.5" style={{ fontSize: 15, color: "#5C6B60" }}>
+          <p className="text-center mt-2" style={{ fontSize: 16, color: "#5C6B60", fontWeight: 400 }}>
             오늘은 어디부터 씻을까요?
           </p>
 

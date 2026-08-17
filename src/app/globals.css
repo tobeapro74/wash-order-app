@@ -32,8 +32,8 @@
 
 html, body {
   height: 100%;
-  font-family: 'Pretendard Variable', 'Pretendard', 'Apple SD Gothic Neo',
-    'Noto Sans KR', 'Malgun Gothic', -apple-system, sans-serif;
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo',
+    'Malgun Gothic', -apple-system, sans-serif;
   background: linear-gradient(180deg, #EAF7EE 0%, #D8F0E0 45%, #C7ECD9 100%);
   background-attachment: fixed;
   color: var(--ink900);

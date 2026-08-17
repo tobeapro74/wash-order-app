@@ -14,11 +14,11 @@ interface KaechiProps {
 // normal/wave/happy/question → 메인 캐릭터
 // mini → 메인 캐릭터 (작게)
 const MOOD_IMAGE: Record<KaechiMood, string> = {
-  normal:   "/char-main.png",
-  happy:    "/char-main.png",
-  question: "/char-main.png",
-  wave:     "/char-main.png",
-  mini:     "/char-main.png",
+  normal:   "/char-fairy.png",
+  happy:    "/char-fairy.png",
+  question: "/char-fairy.png",
+  wave:     "/char-fairy.png",
+  mini:     "/char-fairy.png",
 };
 
 export function Kaechi({ mood = "normal", size = 80, animate = true }: KaechiProps) {

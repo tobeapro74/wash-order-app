@@ -6,42 +6,39 @@ const TABS = [
   {
     href: "/today",
     label: "오늘의 순서",
-    icon: (active: boolean) => (
-      <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6"
-        stroke={active ? "#1F6E42" : "#5C6B60"} strokeWidth={active ? 2.4 : 1.8}>
-        <circle cx="12" cy="12" r="9" strokeLinecap="round"/>
-        <circle cx="12" cy="12" r="3" fill={active ? "#1F6E42" : "none"}
-          stroke={active ? "#1F6E42" : "#5C6B60"}/>
-        <line x1="12" y1="3"  x2="12" y2="6"  strokeLinecap="round"/>
-        <line x1="12" y1="18" x2="12" y2="21" strokeLinecap="round"/>
-        <line x1="3"  y1="12" x2="6"  y2="12" strokeLinecap="round"/>
-        <line x1="18" y1="12" x2="21" y2="12" strokeLinecap="round"/>
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="9" strokeWidth={1.8}/>
+        <circle cx="12" cy="12" r="3" strokeWidth={1.8}/>
+        <line x1="12" y1="3"  x2="12" y2="6"  strokeWidth={1.8}/>
+        <line x1="12" y1="18" x2="12" y2="21" strokeWidth={1.8}/>
+        <line x1="3"  y1="12" x2="6"  y2="12" strokeWidth={1.8}/>
+        <line x1="18" y1="12" x2="21" y2="12" strokeWidth={1.8}/>
       </svg>
     ),
   },
   {
     href: "/building",
     label: "빌딩 순위",
-    icon: (active: boolean) => (
-      <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6"
-        stroke={active ? "#1F6E42" : "#5C6B60"} strokeWidth={active ? 2.4 : 1.8}>
-        <rect x="4" y="3" width="16" height="18" rx="2" strokeLinecap="round"/>
-        <line x1="8"  y1="8"  x2="16" y2="8"  strokeLinecap="round"/>
-        <line x1="8"  y1="12" x2="16" y2="12" strokeLinecap="round"/>
-        <rect x="9" y="16" width="6" height="5" rx="0.5"
-          fill={active ? "#1F6E42" : "none"}
-          stroke={active ? "#1F6E42" : "#5C6B60"}/>
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth={1.8}/>
+        <line x1="7" y1="8"  x2="17" y2="8"  strokeWidth={1.8}/>
+        <line x1="7" y1="12" x2="17" y2="12" strokeWidth={1.8}/>
+        <rect x="9" y="15" width="6" height="6" rx="0.5" strokeWidth={1.8}/>
       </svg>
     ),
   },
   {
     href: "/setup",
     label: "내 순서",
-    icon: (active: boolean) => (
-      <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6"
-        stroke={active ? "#1F6E42" : "#5C6B60"} strokeWidth={active ? 2.4 : 1.8}>
-        <circle cx="12" cy="8" r="4" strokeLinecap="round"/>
-        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" strokeLinecap="round"/>
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="8" r="4" strokeWidth={1.8}/>
+        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" strokeWidth={1.8}/>
       </svg>
     ),
   },
@@ -53,39 +50,47 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-40"
+      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-40 bg-white"
       style={{
-        background: "#FFFFFF",
         borderTop: "1px solid #EDEDED",
         paddingBottom: "env(safe-area-inset-bottom)",
-        boxShadow: "0 -4px 20px rgba(0,0,0,0.06)",
+        boxShadow: "0 -2px 12px rgba(0,0,0,0.05)",
       }}
     >
-      <div className="flex items-center justify-around px-2">
+      <div className="flex items-center justify-around">
         {TABS.map(tab => {
           const active = pathname === tab.href || pathname.startsWith(tab.href + "/");
+
           return (
             <button
               key={tab.href}
               onClick={() => router.push(tab.href)}
-              className="flex flex-1 flex-col items-center py-3 transition-colors"
-              style={{ gap: 3 }}
+              className="flex flex-1 flex-col items-center gap-0.5 py-2 transition-colors"
             >
-              {/* 활성 탭: pill 캡슐 감싸기 */}
               {active ? (
+                /* 활성: pill 캡슐 — 라벨만, 아이콘 없음 */
                 <span
-                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-full"
-                  style={{ background: "rgba(63,169,107,0.13)" }}
+                  className="flex items-center justify-center rounded-full px-5 py-2"
+                  style={{
+                    background: "rgba(63,169,107,0.13)",
+                    minWidth: 88,
+                  }}
                 >
-                  {tab.icon(true)}
-                  <span className="text-[12px] font-bold" style={{ color: "#1F6E42" }}>
+                  <span
+                    className="text-[13px] font-bold"
+                    style={{ color: "#1F6E42" }}
+                  >
                     {tab.label}
                   </span>
                 </span>
               ) : (
+                /* 비활성: 아이콘 + 라벨 */
                 <>
-                  {tab.icon(false)}
-                  <span className="text-[11px] font-medium" style={{ color: "#5C6B60" }}>
+                  <span style={{ color: "#5C6B60" }}>{tab.icon}</span>
+                  <span
+                    className="text-[11px] font-medium"
+                    style={{ color: "#5C6B60" }}
+                  >
                     {tab.label}
                   </span>
                 </>

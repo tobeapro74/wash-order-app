@@ -7,6 +7,7 @@ import {
 } from "@/lib/wash";
 import { apiGetRankings } from "@/lib/api";
 import { Kaechi, WASH_CHAR } from "@/components/Kaechi";
+import { BottomNav } from "@/components/BottomNav";
 import Image from "next/image";
 
 export default function BuildingPage() {
@@ -22,7 +23,6 @@ export default function BuildingPage() {
     if (!my) { router.replace("/setup"); return; }
     setMyOrder(my);
 
-    // 서버 랭킹 우선, 실패 시 로컬 fallback
     apiGetRankings().then(serverRankings => {
       if (serverRankings.length > 0) {
         const ranked = serverRankings.map(r => ({
@@ -52,20 +52,25 @@ export default function BuildingPage() {
   return (
     <div className="flex flex-col min-h-dvh" style={{ background: "#E8F5EE" }}>
 
-      {/* 헤더 */}
-      <div className="px-6 pt-12 pb-5 text-white text-center flex-shrink-0"
-        style={{ background: "linear-gradient(135deg,#5BAF7A 0%,#3D8A5C 100%)" }}>
-        <p className="text-xs font-semibold mb-0.5 tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.7)" }}>
+      {/* 헤더: 텍스트만 */}
+      <div className="px-6 pt-14 pb-2 text-center flex-shrink-0">
+        <p className="text-[11px] font-bold tracking-[0.18em] uppercase" style={{ color: "#8FAF97" }}>
           씻기 빌딩
         </p>
-        <h1 className="text-2xl font-extrabold">🏢 24층 씻기 빌딩</h1>
-        <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.6)" }}>블록을 눌러서 씻기 순서를 확인해요</p>
+        <h1 className="text-xl font-extrabold mt-0.5" style={{ color: "#2D3A2E" }}>
+          🏢 24층 씻기 빌딩
+        </h1>
+        <p className="text-xs mt-1" style={{ color: "#8FAF97" }}>블록을 눌러서 씻기 순서를 확인해요</p>
       </div>
 
       {/* 스카이라운지 보상 배너 */}
       {showReward && (
-        <div className="mx-4 mt-4 rounded-2xl p-4 flex items-center gap-3"
-          style={{ background: "#FFF8D6", border: "2px solid #F5C842" }}>
+        <div className="mx-4 mt-3 rounded-2xl p-4 flex items-center gap-3"
+          style={{
+            background: "#FFF8D6",
+            border: "2px solid #F5C842",
+            boxShadow: "0 4px 0 #E0A800, 0 8px 16px rgba(245,200,66,0.2)",
+          }}>
           <Kaechi mood="happy" size={48} animate={false} />
           <div>
             <p className="font-extrabold text-sm" style={{ color: "#7B5EA7" }}>🎊 스카이라운지 입장!</p>
@@ -79,13 +84,13 @@ export default function BuildingPage() {
 
         {/* 스카이라운지 */}
         <div className="flex justify-center mb-2">
-          <div className="rounded-2xl px-6 py-3 text-center font-extrabold text-sm shadow-lg"
+          <div className="rounded-2xl px-6 py-3 text-center font-extrabold text-sm"
             style={{
               background: "linear-gradient(135deg,#F5C842,#E0A800)",
               color: "#7B5EA7",
               border: "2px solid #FFE566",
               minWidth: 180,
-              boxShadow: "0 4px 16px rgba(245,200,66,0.35)",
+              boxShadow: "0 4px 0 #C08800, 0 8px 16px rgba(245,200,66,0.3)",
             }}>
             🌟 스카이라운지
             <div className="text-xs font-normal mt-0.5" style={{ opacity: 0.75 }}>여기 도달하면 보상!</div>
@@ -111,10 +116,10 @@ export default function BuildingPage() {
 
             let bg = "#FFFFFF";
             let borderColor = "#C2E4CF";
-            let floorColor = "#8FAF97";
-            if (isMine)    { bg = "#EDF7F1"; borderColor = "#5BAF7A"; floorColor = "#3D8A5C"; }
-            if (isTop)     { bg = "#FFF8D6"; borderColor = "#F5C842"; floorColor = "#7B5EA7"; }
-            if (isBottom)  { bg = "#F2FAF5"; borderColor = "#C2E4CF"; floorColor = "#8FAF97"; }
+            let shadow = "0 2px 0 #C2E4CF";
+            if (isMine)    { bg = "#EDF7F1"; borderColor = "#5BAF7A"; shadow = "0 2px 0 #3D8A5C"; }
+            if (isTop)     { bg = "#FFF8D6"; borderColor = "#F5C842"; shadow = "0 2px 0 #E0A800"; }
+            if (isBottom)  { bg = "#F2FAF5"; borderColor = "#C2E4CF"; shadow = "0 2px 0 #A8D8BC"; }
             if (isSelected){ bg = "#EDF7F1"; borderColor = "#3D8A5C"; }
 
             return (
@@ -127,9 +132,7 @@ export default function BuildingPage() {
                       paddingLeft: 16, paddingRight: 16, paddingTop: 12, paddingBottom: 12,
                       background: bg,
                       border: `2px solid ${borderColor}`,
-                      boxShadow: isMine
-                        ? "0 2px 12px rgba(91,175,122,0.20)"
-                        : "0 1px 4px rgba(0,0,0,0.05)",
+                      boxShadow: shadow,
                     }}>
                     {/* 층수 (선택 안됐을 때) */}
                     {!isSelected && (
@@ -184,37 +187,7 @@ export default function BuildingPage() {
         </p>
       </div>
 
-      {/* 하단 탭 */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white flex z-40"
-        style={{ borderTop: "1px solid #C2E4CF" }}>
-        <button onClick={() => router.push("/today")} className="flex-1 py-3.5 flex flex-col items-center gap-1">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <circle cx="11" cy="11" r="9" stroke="#8FAF97" strokeWidth="2"/>
-            <circle cx="11" cy="11" r="3" fill="#8FAF97"/>
-            <line x1="11" y1="2" x2="11" y2="5" stroke="#8FAF97" strokeWidth="2" strokeLinecap="round"/>
-            <line x1="11" y1="17" x2="11" y2="20" stroke="#8FAF97" strokeWidth="2" strokeLinecap="round"/>
-            <line x1="2" y1="11" x2="5" y2="11" stroke="#8FAF97" strokeWidth="2" strokeLinecap="round"/>
-            <line x1="17" y1="11" x2="20" y2="11" stroke="#8FAF97" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-          <span className="text-[10px] font-bold" style={{ color: "#8FAF97" }}>오늘의 순서</span>
-        </button>
-        <button onClick={() => router.push("/building")} className="flex-1 py-3.5 flex flex-col items-center gap-1">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <rect x="4" y="3" width="14" height="17" rx="1.5" stroke="#5BAF7A" strokeWidth="2"/>
-            <line x1="8" y1="8" x2="14" y2="8" stroke="#5BAF7A" strokeWidth="1.5" strokeLinecap="round"/>
-            <line x1="8" y1="12" x2="14" y2="12" stroke="#5BAF7A" strokeWidth="1.5" strokeLinecap="round"/>
-            <rect x="8.5" y="15" width="5" height="5" rx="0.5" fill="#5BAF7A"/>
-          </svg>
-          <span className="text-[10px] font-bold" style={{ color: "#5BAF7A" }}>빌딩 순위</span>
-        </button>
-        <button onClick={() => router.push("/setup")} className="flex-1 py-3.5 flex flex-col items-center gap-1">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <circle cx="11" cy="8" r="3.5" stroke="#8FAF97" strokeWidth="2"/>
-            <path d="M4 19c0-3.866 3.134-7 7-7h0c3.866 0 7 3.134 7 7" stroke="#8FAF97" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-          <span className="text-[10px] font-bold" style={{ color: "#8FAF97" }}>내 순서</span>
-        </button>
-      </div>
+      <BottomNav />
     </div>
   );
 }

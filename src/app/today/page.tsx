@@ -9,43 +9,10 @@ import {
 import { apiVote, apiGetTodayOrder } from "@/lib/api";
 import { RouletteWheel } from "@/components/RouletteWheel";
 import { Kaechi, WASH_CHAR } from "@/components/Kaechi";
+import { BottomNav } from "@/components/BottomNav";
 import Image from "next/image";
 
 type Phase = "spin" | "result" | "voted";
-
-function IconSpin({ active }: { active: boolean }) {
-  const c = active ? "#5BAF7A" : "#8FAF97";
-  return (
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-      <circle cx="11" cy="11" r="9" stroke={c} strokeWidth="2"/>
-      <circle cx="11" cy="11" r="3" fill={c}/>
-      <line x1="11" y1="2" x2="11" y2="5" stroke={c} strokeWidth="2" strokeLinecap="round"/>
-      <line x1="11" y1="17" x2="11" y2="20" stroke={c} strokeWidth="2" strokeLinecap="round"/>
-      <line x1="2" y1="11" x2="5" y2="11" stroke={c} strokeWidth="2" strokeLinecap="round"/>
-      <line x1="17" y1="11" x2="20" y2="11" stroke={c} strokeWidth="2" strokeLinecap="round"/>
-    </svg>
-  );
-}
-function IconBuilding({ active }: { active: boolean }) {
-  const c = active ? "#5BAF7A" : "#8FAF97";
-  return (
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-      <rect x="4" y="3" width="14" height="17" rx="1.5" stroke={c} strokeWidth="2"/>
-      <line x1="8" y1="8" x2="14" y2="8" stroke={c} strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="8" y1="12" x2="14" y2="12" stroke={c} strokeWidth="1.5" strokeLinecap="round"/>
-      <rect x="8.5" y="15" width="5" height="5" rx="0.5" fill={c}/>
-    </svg>
-  );
-}
-function IconMe({ active }: { active: boolean }) {
-  const c = active ? "#5BAF7A" : "#8FAF97";
-  return (
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-      <circle cx="11" cy="8" r="3.5" stroke={c} strokeWidth="2"/>
-      <path d="M4 19c0-3.866 3.134-7 7-7h0c3.866 0 7 3.134 7 7" stroke={c} strokeWidth="2" strokeLinecap="round"/>
-    </svg>
-  );
-}
 
 export default function TodayPage() {
   const router = useRouter();
@@ -77,7 +44,7 @@ export default function TodayPage() {
     if (!resultOrder) return;
     vote(resultOrder, true);
     markVotedToday();
-    apiVote(orderKey(resultOrder), true); // 서버 투표
+    apiVote(orderKey(resultOrder), true);
     setPhase("voted");
   };
 
@@ -85,7 +52,7 @@ export default function TodayPage() {
     if (!resultOrder) return;
     vote(resultOrder, false);
     markVotedToday();
-    apiVote(orderKey(resultOrder), false); // 서버 투표
+    apiVote(orderKey(resultOrder), false);
     setShowDislike(false);
     setPhase("voted");
   };
@@ -93,22 +60,23 @@ export default function TodayPage() {
   return (
     <div className="flex flex-col min-h-dvh" style={{ background: "#E8F5EE" }}>
 
-      {/* 헤더 */}
-      <div className="px-6 pt-20 pb-8 text-white text-center flex-shrink-0"
-        style={{ background: "linear-gradient(135deg,#5BAF7A 0%,#3D8A5C 100%)" }}>
-        <p className="text-xs font-semibold mb-1 tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.7)" }}>
+      {/* 헤더: 텍스트만, 그라디언트 없음 */}
+      <div className="px-6 pt-14 pb-2 text-center flex-shrink-0">
+        <p className="text-[11px] font-bold tracking-[0.18em] uppercase" style={{ color: "#8FAF97" }}>
           오늘의 씻기 순서
         </p>
-        <h1 className="text-2xl font-extrabold leading-snug">오늘은 어디부터 씻을까요?</h1>
+        <h1 className="text-xl font-extrabold mt-0.5" style={{ color: "#2D3A2E" }}>
+          오늘은 어디부터 씻을까요? 🚿
+        </h1>
       </div>
 
       {/* 콘텐츠 */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-24 gap-6">
+      <div className="flex-1 flex flex-col items-center justify-center px-5 pb-28 gap-5">
 
         {/* SPIN */}
         {phase === "spin" && (
           <>
-            <div style={{ marginTop: -60 }}>
+            <div style={{ marginTop: -40 }}>
               <Kaechi mood="normal" size={120} />
             </div>
             <RouletteWheel myOrder={myOrder} onResult={handleResult} />
@@ -134,26 +102,32 @@ export default function TodayPage() {
               <Kaechi mood="normal" size={128} />
             )}
 
-            <div className="w-full rounded-3xl p-6 text-center"
+            {/* 결과 카드 - 3D 그림자 */}
+            <div className="w-full rounded-3xl p-6 text-center bounce-in"
               style={{
                 background: isJoker ? "#FFF8D6" : "#FFFFFF",
                 border: `2px solid ${isJoker ? "#F5C842" : "#C2E4CF"}`,
+                boxShadow: isJoker
+                  ? "0 8px 0 #E0A800, 0 12px 24px rgba(245,200,66,0.25)"
+                  : "0 6px 0 #B8DECA, 0 10px 20px rgba(91,175,122,0.12)",
               }}>
               {isJoker && (
                 <p className="text-xs font-bold mb-3 tracking-widest" style={{ color: "#7B5EA7" }}>
                   ⭐ 나의 루틴 당첨!
                 </p>
               )}
-              <div className="flex items-center justify-center gap-1 mb-3">
+              <div className="flex items-center justify-center gap-1 mb-4">
                 {resultOrder.map((id, i) => {
                   const el = WASH_ELEMENTS.find(e => e.id === id)!;
                   return (
                     <span key={id} className="flex items-center gap-1">
-                      <span className="flex flex-col items-center gap-0.5">
-                        <Image src={WASH_CHAR[id]} alt={el.label} width={52} height={52} style={{ objectFit: "contain" }} />
+                      <span className="flex flex-col items-center gap-1">
+                        <div className="rounded-2xl p-2" style={{ background: "#F2FAF5" }}>
+                          <Image src={WASH_CHAR[id]} alt={el.label} width={56} height={56} style={{ objectFit: "contain" }} />
+                        </div>
                         <span className="text-xs font-bold" style={{ color: "#4A6350" }}>{el.label}</span>
                       </span>
-                      {i < resultOrder.length - 1 && <span className="text-sm mx-0.5" style={{ color: "#C2E4CF" }}>→</span>}
+                      {i < resultOrder.length - 1 && <span className="text-base mx-0.5" style={{ color: "#C2E4CF" }}>→</span>}
                     </span>
                   );
                 })}
@@ -163,13 +137,23 @@ export default function TodayPage() {
 
             <div className="w-full flex gap-3">
               <button onClick={handleLike}
-                className="flex-1 py-4 rounded-2xl font-extrabold text-base flex items-center justify-center gap-2 active:scale-95 transition-transform"
-                style={{ background: "#E0F5EA", color: "#3D8A5C", border: "2px solid #A8DBBE" }}>
+                className="flex-1 py-4 rounded-2xl font-extrabold text-base flex items-center justify-center gap-2 active:scale-95 transition-transform btn-3d"
+                style={{
+                  background: "#E0F5EA",
+                  color: "#3D8A5C",
+                  border: "2px solid #A8DBBE",
+                  boxShadow: "0 5px 0 #7BC4A0",
+                }}>
                 👍 좋아요
               </button>
               <button onClick={() => setShowDislike(true)}
-                className="flex-1 py-4 rounded-2xl font-extrabold text-base flex items-center justify-center gap-2 active:scale-95 transition-transform"
-                style={{ background: "#FDEAEA", color: "#C04040", border: "2px solid #F0BABA" }}>
+                className="flex-1 py-4 rounded-2xl font-extrabold text-base flex items-center justify-center gap-2 active:scale-95 transition-transform btn-3d"
+                style={{
+                  background: "#FDEAEA",
+                  color: "#C04040",
+                  border: "2px solid #F0BABA",
+                  boxShadow: "0 5px 0 #E0A0A0",
+                }}>
                 👎 싫어요
               </button>
             </div>
@@ -184,56 +168,56 @@ export default function TodayPage() {
         {/* VOTED */}
         {phase === "voted" && resultOrder && (
           <>
-            <Kaechi mood="wave" size={128} />
-            <div className="w-full rounded-3xl p-6 text-center"
-              style={{ background: "#FFFFFF", border: "2px solid #C2E4CF" }}>
-              <p className="text-xs font-bold mb-3 tracking-widest uppercase" style={{ color: "#8FAF97" }}>
+            <Kaechi mood="wave" size={136} />
+
+            {/* 오늘의 순서 카드 - 더 크고 3D */}
+            <div className="w-full rounded-3xl p-6 text-center bounce-in"
+              style={{
+                background: "#FFFFFF",
+                border: "2px solid #C2E4CF",
+                boxShadow: "0 6px 0 #B8DECA, 0 10px 20px rgba(91,175,122,0.12)",
+              }}>
+              <p className="text-[11px] font-bold mb-4 tracking-[0.16em] uppercase" style={{ color: "#8FAF97" }}>
                 오늘의 씻기 순서
               </p>
-              <div className="flex items-center justify-center gap-1 mb-3">
+              <div className="flex items-center justify-center gap-2 mb-4">
                 {resultOrder.map((id, i) => {
                   const el = WASH_ELEMENTS.find(e => e.id === id)!;
                   return (
-                    <span key={id} className="flex items-center gap-1">
-                      <span className="flex flex-col items-center gap-0.5">
-                        <Image src={WASH_CHAR[id]} alt={el.label} width={52} height={52} style={{ objectFit: "contain" }} />
+                    <span key={id} className="flex items-center gap-2">
+                      <span className="flex flex-col items-center gap-1">
+                        <div className="rounded-2xl p-2" style={{ background: "#F2FAF5" }}>
+                          <Image src={WASH_CHAR[id]} alt={el.label} width={60} height={60} style={{ objectFit: "contain" }} />
+                        </div>
                         <span className="text-xs font-bold" style={{ color: "#4A6350" }}>{el.label}</span>
                       </span>
-                      {i < resultOrder.length - 1 && <span className="text-sm mx-0.5" style={{ color: "#C2E4CF" }}>→</span>}
+                      {i < resultOrder.length - 1 && <span className="text-base" style={{ color: "#C2E4CF" }}>→</span>}
                     </span>
                   );
                 })}
               </div>
-              <p className="text-sm" style={{ color: "#8FAF97" }}>오늘 평가를 완료했어요 ✅</p>
+              <p className="text-sm font-semibold" style={{ color: "#8FAF97" }}>오늘 평가를 완료했어요 ✅</p>
             </div>
-            <p className="text-sm text-center leading-relaxed" style={{ color: "#8FAF97" }}>
+
+            <p className="text-sm text-center leading-relaxed fade-up" style={{ color: "#8FAF97" }}>
               내일 아침에 다시 돌아와요!<br/>씻기 요정 캐치가 기다리고 있을게요 🐥
             </p>
+
+            {/* 빌딩 버튼 - 크고 3D */}
             <button onClick={() => router.push("/building")}
-              className="w-full py-4 rounded-2xl text-white font-extrabold text-base active:scale-95 transition-transform"
-              style={{ background: "#5BAF7A" }}>
-              빌딩 순위 확인하기
+              className="w-full py-5 rounded-2xl text-white font-extrabold text-lg btn-3d"
+              style={{
+                background: "linear-gradient(135deg,#5BAF7A 0%,#3D8A5C 100%)",
+                boxShadow: "0 6px 0 #2A6040, 0 10px 20px rgba(61,138,92,0.3)",
+                letterSpacing: "0.03em",
+              }}>
+              🏢 빌딩 순위 확인하기
             </button>
           </>
         )}
       </div>
 
-      {/* 하단 탭 */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white flex z-40"
-        style={{ borderTop: "1px solid #C2E4CF" }}>
-        <button onClick={() => router.push("/today")} className="flex-1 py-3.5 flex flex-col items-center gap-1">
-          <IconSpin active />
-          <span className="text-[10px] font-bold" style={{ color: "#5BAF7A" }}>오늘의 순서</span>
-        </button>
-        <button onClick={() => router.push("/building")} className="flex-1 py-3.5 flex flex-col items-center gap-1">
-          <IconBuilding active={false} />
-          <span className="text-[10px] font-bold" style={{ color: "#8FAF97" }}>빌딩 순위</span>
-        </button>
-        <button onClick={() => router.push("/setup")} className="flex-1 py-3.5 flex flex-col items-center gap-1">
-          <IconMe active={false} />
-          <span className="text-[10px] font-bold" style={{ color: "#8FAF97" }}>내 순서</span>
-        </button>
-      </div>
+      <BottomNav />
 
       {/* 개발용 리셋 버튼 */}
       <button
@@ -244,7 +228,7 @@ export default function TodayPage() {
           setPhase("spin");
         }}
         className="fixed top-4 right-4 z-50 text-[10px] rounded px-2 py-1"
-        style={{ background: "rgba(0,0,0,0.15)", color: "rgba(255,255,255,0.5)" }}
+        style={{ background: "rgba(0,0,0,0.12)", color: "rgba(0,0,0,0.3)" }}
       >
         리셋
       </button>

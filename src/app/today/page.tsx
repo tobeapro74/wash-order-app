@@ -14,39 +14,97 @@ import Image from "next/image";
 
 type Phase = "spin" | "result" | "voted";
 
-// 점선 원형 화살표 — 뉴화면 기준: 반시계방향 호 4개 + 화살표 마커
+// 점선 원형 화살표 — 시계방향: 좌상→우상→우하→좌하→좌상
+// SVG arc: sweep-flag=1 이 시계방향
 function DottedArrow() {
   return (
     <svg viewBox="0 0 260 260" width="100%" height="100%"
       style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
       <defs>
-        <marker id="arr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
-          <path d="M0,0 L0,7 L7,3.5 Z" fill="#3FA96B"/>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+          <path d="M0,0 L0,8 L8,4 Z" fill="#3FA96B"/>
         </marker>
       </defs>
-      {/* 4개 호: 좌상→우상→우하→좌하→좌상 */}
-      {[
-        "M 80 60  A 90 90 0 0 1 180 60",
-        "M 200 80 A 90 90 0 0 1 200 180",
-        "M 180 200 A 90 90 0 0 1 80 200",
-        "M 60 180 A 90 90 0 0 1 60 80",
-      ].map((d, i) => (
-        <path key={i} d={d} fill="none"
-          stroke="#3FA96B" strokeWidth="2"
-          strokeDasharray="3 4" strokeLinecap="round"
-          markerEnd="url(#arr)" />
-      ))}
+      {/* 시계방향 4호: top→right→bottom→left */}
+      <path d="M 100 45  A 85 85 0 0 1 215 100" fill="none"
+        stroke="#3FA96B" strokeWidth="2.5" strokeDasharray="4 5"
+        strokeLinecap="round" markerEnd="url(#arr)" />
+      <path d="M 215 160 A 85 85 0 0 1 160 215" fill="none"
+        stroke="#3FA96B" strokeWidth="2.5" strokeDasharray="4 5"
+        strokeLinecap="round" markerEnd="url(#arr)" />
+      <path d="M 100 215 A 85 85 0 0 1 45 160" fill="none"
+        stroke="#3FA96B" strokeWidth="2.5" strokeDasharray="4 5"
+        strokeLinecap="round" markerEnd="url(#arr)" />
+      <path d="M 45 100  A 85 85 0 0 1 100 45" fill="none"
+        stroke="#3FA96B" strokeWidth="2.5" strokeDasharray="4 5"
+        strokeLinecap="round" markerEnd="url(#arr)" />
     </svg>
   );
 }
 
 // 2×2 그리드 위치 — 각 캐릭터의 중심점 (%)
 const GRID_POS = [
-  { top: "18%",  left: "18%"  },   // 좌상
+  { top: "18%",  left: "18%"  },   // 좌상 (1번 START)
   { top: "18%",  right: "18%" },   // 우상
   { top: "68%",  left: "18%"  },   // 좌하
   { top: "68%",  right: "18%" },   // 우하
 ];
+
+// 씻기 순서 2×2 그리드 (result/voted 공용)
+function OrderGrid({ order, showConfetti, isJoker, mood }: {
+  order: ElementId[];
+  showConfetti?: boolean;
+  isJoker?: boolean;
+  mood: "wave" | "happy";
+}) {
+  return (
+    <div style={{ position: "relative", width: "100%", paddingBottom: "80%", marginBottom: 8 }}>
+      <DottedArrow />
+      {order.map((id, i) => {
+        const el = WASH_ELEMENTS.find(e => e.id === id)!;
+        const pos = GRID_POS[i];
+        const isRight = "right" in pos;
+        return (
+          <div key={id}
+            className="absolute flex flex-col items-center"
+            style={{ ...pos, transform: isRight ? "translateX(50%)" : "translateX(-50%)", gap: 4 }}>
+            {/* 1번 시작점 뱃지 */}
+            {i === 0 && (
+              <div style={{
+                position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)",
+                background: "linear-gradient(180deg,#3FA96B 0%,#2E8C56 100%)",
+                borderRadius: 999, padding: "2px 10px",
+                fontSize: 11, fontWeight: 800, color: "#fff",
+                letterSpacing: "0.05em", whiteSpace: "nowrap",
+                boxShadow: "0 2px 6px rgba(46,140,86,0.4)",
+                zIndex: 5,
+              }}>
+                START
+              </div>
+            )}
+            <Image src={WASH_CHAR[id]} alt={el.label}
+              width={88} height={88} style={{ objectFit: "contain" }} />
+            <span style={{ fontSize: 14, fontWeight: 600, color: "#1E2A22" }}>
+              {el.label}
+            </span>
+          </div>
+        );
+      })}
+      {/* 중앙 마스코트 */}
+      <div className="absolute" style={{ top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 2 }}>
+        {showConfetti && (
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-1 pointer-events-none" style={{ zIndex: 3 }}>
+            {["🎉","✨","🎊","⭐","🎉"].map((e, idx) => (
+              <span key={idx} className="confetti-particle text-base"
+                style={{ animationDelay: `${idx * 0.1}s` }}>{e}</span>
+            ))}
+          </div>
+        )}
+        <Kaechi mood={mood} size={120} animate={false} />
+      </div>
+    </div>
+  );
+}
 
 export default function TodayPage() {
   const router = useRouter();
@@ -168,39 +226,12 @@ export default function TodayPage() {
             </p>
 
             {/* 2×2 그리드 + 마스코트 + 점선 화살표 */}
-            <div style={{ position: "relative", width: "100%", paddingBottom: "80%", marginBottom: 8 }}>
-              <DottedArrow />
-
-              {resultOrder.map((id, i) => {
-                const el  = WASH_ELEMENTS.find(e => e.id === id)!;
-                const pos = GRID_POS[i];
-                const isRight = "right" in pos;
-                return (
-                  <div key={id}
-                    className="absolute flex flex-col items-center"
-                    style={{ ...pos, transform: isRight ? "translateX(50%)" : "translateX(-50%)", gap: 4 }}>
-                    <Image src={WASH_CHAR[id]} alt={el.label}
-                      width={88} height={88} style={{ objectFit: "contain" }} />
-                    <span style={{ fontSize: 14, fontWeight: 600, color: "#1E2A22" }}>
-                      {el.label}
-                    </span>
-                  </div>
-                );
-              })}
-
-              {/* 중앙 마스코트 + 컨페티 */}
-              <div className="absolute" style={{ top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 2 }}>
-                {showConfetti && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-1 pointer-events-none" style={{ zIndex: 3 }}>
-                    {["🎉","✨","🎊","⭐","🎉"].map((e, i) => (
-                      <span key={i} className="confetti-particle text-base"
-                        style={{ animationDelay: `${i * 0.1}s` }}>{e}</span>
-                    ))}
-                  </div>
-                )}
-                <Kaechi mood={isJoker ? "happy" : "wave"} size={120} animate={false} />
-              </div>
-            </div>
+            <OrderGrid
+              order={resultOrder}
+              showConfetti={showConfetti}
+              isJoker={isJoker}
+              mood={isJoker ? "happy" : "wave"}
+            />
 
             {/* 카피 문구 */}
             <p className="text-center" style={{ fontSize: 13, color: "#5C6B60", fontStyle: "italic" }}>
@@ -269,38 +300,7 @@ export default function TodayPage() {
             </p>
 
             {/* 2×2 그리드 + 마스코트 + 점선 화살표 */}
-            <div style={{ position: "relative", width: "100%", paddingBottom: "80%", marginBottom: 16 }}>
-              {/* 점선 화살표 */}
-              <DottedArrow />
-
-              {/* 4개 캐릭터 — absolute 배치 */}
-              {resultOrder.map((id, i) => {
-                const el  = WASH_ELEMENTS.find(e => e.id === id)!;
-                const pos = GRID_POS[i];
-                const isRight = "right" in pos;
-                return (
-                  <div key={id}
-                    className="absolute flex flex-col items-center"
-                    style={{
-                      ...pos,
-                      transform: isRight ? "translateX(50%)" : "translateX(-50%)",
-                      gap: 4,
-                    }}>
-                    <Image src={WASH_CHAR[id]} alt={el.label}
-                      width={88} height={88} style={{ objectFit: "contain" }} />
-                    <span style={{ fontSize: 14, fontWeight: 600, color: "#1E2A22" }}>
-                      {el.label}
-                    </span>
-                  </div>
-                );
-              })}
-
-              {/* 중앙 마스코트 */}
-              <div className="absolute"
-                style={{ top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 2 }}>
-                <Kaechi mood="wave" size={120} animate={false} />
-              </div>
-            </div>
+            <OrderGrid order={resultOrder} mood="wave" />
 
             {/* 완료 메시지 */}
             <div className="text-center" style={{ marginTop: 8 }}>

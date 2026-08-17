@@ -11,6 +11,7 @@ import {
 import { apiGetRankings } from "@/lib/api";
 import { Kaechi, WASH_CHAR } from "@/components/Kaechi";
 import { BottomNav } from "@/components/BottomNav";
+import { useAuth } from "@/hooks/useAuth";
 import Image from "next/image";
 
 // 층별 블록 폭: 상층(23층)이 230px, 내려갈수록 6px씩 넓어짐
@@ -26,6 +27,7 @@ function widthForFloor(floor: number, topFloor: number): number {
 
 export default function BuildingPage() {
   const router = useRouter();
+  useAuth();  // 비로그인 시 /login 리다이렉트
   const [myOrder,       setMyOrder]       = useState<ElementId[] | null>(null);
   const [ranking,       setRanking]       = useState<{ order: ElementId[]; score: number }[]>([]);
   const [selectedFloor, setSelectedFloor] = useState<number | null>(null);

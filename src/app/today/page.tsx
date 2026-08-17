@@ -10,6 +10,7 @@ import { apiVote } from "@/lib/api";
 import { RouletteWheel } from "@/components/RouletteWheel";
 import { Kaechi, WASH_CHAR } from "@/components/Kaechi";
 import { BottomNav } from "@/components/BottomNav";
+import { useAuth } from "@/hooks/useAuth";
 import Image from "next/image";
 
 type Phase = "spin" | "result" | "voted";
@@ -108,6 +109,7 @@ function OrderGrid({ order, showConfetti, isJoker, mood }: {
 
 export default function TodayPage() {
   const router = useRouter();
+  useAuth();  // 비로그인 시 /login 리다이렉트
   const [myOrder,      setMyOrder]      = useState<ElementId[] | null>(null);
   const [resultOrder,  setResultOrder]  = useState<ElementId[] | null>(null);
   const [isJoker,      setIsJoker]      = useState(false);

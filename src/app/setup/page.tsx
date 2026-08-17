@@ -6,6 +6,7 @@ import { WASH_ELEMENTS, ElementId, saveMyOrder, loadMyOrder } from "@/lib/wash";
 import { apiSaveMyOrder, apiGetMyOrder } from "@/lib/api";
 import { Kaechi, WASH_CHAR } from "@/components/Kaechi";
 import { BottomNav } from "@/components/BottomNav";
+import { useAuth } from "@/hooks/useAuth";
 import Image from "next/image";
 
 const STEP_LABELS    = ["첫 번째", "두 번째", "세 번째", "마지막"];
@@ -29,6 +30,7 @@ function HandleIcon() {
 
 export default function SetupPage() {
   const router   = useRouter();
+  useAuth();  // 비로그인 시 /login 리다이렉트
   const [myOrder, setMyOrder] = useState<ElementId[] | null | undefined>(undefined);
   const [selected, setSelected] = useState<ElementId[]>([]);
 

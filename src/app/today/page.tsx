@@ -188,83 +188,166 @@ export default function TodayPage() {
 
       {/* ══════════════ RESULT 화면 ══════════════ */}
       {phase === "result" && resultOrder && (
-        <div className="flex-1 flex flex-col items-center px-5 pb-28"
-          style={{ paddingTop: 24 }}>
+        <div style={{
+          flex: 1, display: "flex", flexDirection: "column",
+          alignItems: "center", padding: "0 20px 120px",
+        }}>
 
-          {/* 타이틀 */}
-          <h1 className="text-center bounce-in"
-            style={{
-              fontSize: 38, fontWeight: 900,
-              color: "#1E2A22", lineHeight: 1.2,
-              letterSpacing: "-1px", marginBottom: 24,
-            }}>
-            오늘은<br/>어디부터 씻을까요?
-          </h1>
-
-          {/* 순서 카드 */}
-          <div className="w-full bounce-in"
-            style={{
-              background: isJoker ? "#FBEFC9" : "#D8F0E0",
-              borderRadius: 24,
-              padding: 24,
-              boxShadow: "0 6px 20px rgba(31,110,66,0.13)",
-              position: "relative",
-              marginBottom: 20,
-            }}>
-
-            {/* 조커 배지 */}
-            {isJoker && (
-              <p className="text-center" style={{ fontSize: 12, fontWeight: 700, color: "#7C6FE0", letterSpacing: "0.1em", marginBottom: 8 }}>
-                ⭐ 나의 루틴 당첨!
-              </p>
+          {/* 마스코트 + 글로우 */}
+          <div style={{
+            marginTop: 40, position: "relative",
+            width: 140, height: 140,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            {/* 글로우 원 */}
+            <div style={{
+              position: "absolute", inset: -20, borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(245,200,75,0.35) 0%, rgba(245,200,75,0) 70%)",
+              filter: "blur(4px)",
+            }} />
+            {/* sparkle */}
+            {["✦","✦","✦"].map((s, i) => (
+              <span key={i} style={{
+                position: "absolute",
+                top: ["-8px","10px","-4px"][i],
+                left: ["-12px","140px","120px"][i],
+                fontSize: [14, 10, 12][i],
+                color: "#F5C84B",
+                opacity: 0.9,
+              }}>{s}</span>
+            ))}
+            <Kaechi mood={isJoker ? "happy" : "normal"} size={140} animate />
+            {showConfetti && (
+              <div style={{
+                position: "absolute", top: -16, left: "50%",
+                transform: "translateX(-50%)",
+                display: "flex", gap: 4, pointerEvents: "none", zIndex: 3,
+              }}>
+                {["🎉","✨","🎊","⭐","🎉"].map((e, i) => (
+                  <span key={i} className="confetti-particle"
+                    style={{ fontSize: 16, animationDelay: `${i * 0.1}s` }}>{e}</span>
+                ))}
+              </div>
             )}
-
-            {/* 카드 내부 타이틀 */}
-            <p className="text-center"
-              style={{ fontSize: 15, fontWeight: 600, color: "#1E2A22", marginBottom: 16 }}>
-              오늘의 씻기 순서
-            </p>
-
-            {/* 2×2 그리드 + 마스코트 + 점선 화살표 */}
-            <OrderGrid
-              order={resultOrder}
-              showConfetti={showConfetti}
-              isJoker={isJoker}
-              mood={isJoker ? "happy" : "wave"}
-            />
-
-            {/* 카피 문구 */}
-            <p className="text-center" style={{ fontSize: 13, color: "#5C6B60", fontStyle: "italic" }}>
-              "{copy}"
-            </p>
           </div>
 
-          {/* 좋아요 / 싫어요 버튼 */}
-          <div className="w-full flex gap-3">
-            <button onClick={handleLike}
-              className="flex-1 active:scale-95 transition-transform"
-              style={{
-                height: 56, borderRadius: 999,
-                background: "linear-gradient(180deg,#4CBE7C 0%,#2E8C56 100%)",
-                color: "#fff", fontSize: 16, fontWeight: 700,
-                boxShadow: "0 6px 18px rgba(46,140,86,0.3)",
-                border: "none", cursor: "pointer",
-              }}>
-              👍 좋아요
+          {/* 말풍선 태그 */}
+          <div style={{
+            alignSelf: "flex-end", marginTop: -12, marginBottom: 4,
+            background: "rgba(255,255,255,0.92)",
+            borderRadius: 999, padding: "8px 16px",
+            fontSize: 14, fontWeight: 500, color: "#1F6E42",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            position: "relative",
+          }}>
+            🐣 씻기 요정이 정했어요.
+            {/* 말풍선 꼬리 */}
+            <span style={{
+              position: "absolute", top: "50%", left: -8,
+              transform: "translateY(-50%)",
+              width: 0, height: 0,
+              borderTop: "6px solid transparent",
+              borderBottom: "6px solid transparent",
+              borderRight: "8px solid rgba(255,255,255,0.92)",
+            }} />
+          </div>
+
+          {/* 결과 카드 */}
+          <div className="bounce-in" style={{
+            width: "100%",
+            borderRadius: 28,
+            padding: "28px 24px",
+            background: isJoker
+              ? "linear-gradient(180deg,#FBEFC9 0%,#F7E8B8 100%)"
+              : "linear-gradient(180deg,#FFFFFF 0%,#D8F0E0 100%)",
+            boxShadow: "0 10px 24px rgba(31,110,66,0.12)",
+            marginBottom: 20,
+          }}>
+            {/* 카드 타이틀 */}
+            <p style={{
+              textAlign: "center", fontSize: 18, fontWeight: 800,
+              color: "#1E2A22", marginBottom: 20,
+              letterSpacing: "-0.3px",
+            }}>
+              {isJoker ? "⭐ 나의 루틴 당첨!" : "4단 세탁 순서"}
+            </p>
+
+            {/* 가로 4단 아이콘 로우 */}
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+              {resultOrder.map((id, i) => {
+                const el = WASH_ELEMENTS.find(e => e.id === id)!;
+                return (
+                  <div key={id} style={{ display: "contents" }}>
+                    {/* 아이콘 + 라벨 */}
+                    <div style={{
+                      display: "flex", flexDirection: "column",
+                      alignItems: "center", gap: 8, flexShrink: 0,
+                    }}>
+                      <div style={{
+                        width: 64, height: 64, borderRadius: "50%",
+                        background: "#D8F0E0",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        boxShadow: "inset 0 2px 4px rgba(0,0,0,0.04)",
+                      }}>
+                        <Image src={WASH_CHAR[id]} alt={el.label}
+                          width={52} height={52} style={{ objectFit: "contain" }} />
+                      </div>
+                      <span style={{ fontSize: 15, fontWeight: 600, color: "#1E2A22" }}>
+                        {el.label}
+                      </span>
+                    </div>
+                    {/* 아이콘 사이 곡선 점선 화살표 */}
+                    {i < resultOrder.length - 1 && (
+                      <svg width="32" height="28" viewBox="0 0 32 28"
+                        style={{ flexShrink: 0, marginTop: 12 }}>
+                        <path d="M2 22 Q16 -4 30 22"
+                          stroke="#9B8FD4" strokeWidth="2"
+                          strokeDasharray="3 4" strokeLinecap="round" fill="none" />
+                        <path d="M26 19 L30 22 L27 26"
+                          stroke="#9B8FD4" strokeWidth="2"
+                          strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                      </svg>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 투표 버튼 */}
+          <div style={{ width: "100%", display: "flex", gap: 12, marginBottom: 16 }}>
+            <button onClick={handleLike} style={{
+              flex: 1, height: 60, borderRadius: 999, border: "none",
+              background: "linear-gradient(180deg,#4CBE7C 0%,#2E8C56 100%)",
+              color: "#fff", fontSize: 17, fontWeight: 700,
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              boxShadow: "0 8px 20px rgba(46,140,86,0.35)",
+              cursor: "pointer",
+            }}>
+              👍 좋아요 ✨
             </button>
-            <button onClick={() => setShowDislike(true)}
-              className="flex-1 active:scale-95 transition-transform"
-              style={{
-                height: 56, borderRadius: 999,
-                background: "#fff", color: "#1E2A22",
-                fontSize: 16, fontWeight: 700,
-                border: "2px solid #D8F0E0",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
-                cursor: "pointer",
-              }}>
+            <button onClick={() => setShowDislike(true)} style={{
+              flex: 1, height: 60, borderRadius: 999,
+              background: "#FFFFFF", color: "#D9564A",
+              fontSize: 17, fontWeight: 700,
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              border: "2px solid #F0857A",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.06)",
+              cursor: "pointer",
+            }}>
               👎 싫어요
             </button>
           </div>
+
+          {/* 빌딩 순위 보기 — 세컨더리 pill */}
+          <button onClick={() => router.push("/building")} style={{
+            height: 44, padding: "0 24px", borderRadius: 999, border: "none",
+            background: "#D8F0E0", color: "#1F6E42",
+            fontSize: 15, fontWeight: 600, cursor: "pointer",
+            boxShadow: "0 2px 8px rgba(31,110,66,0.10)",
+          }}>
+            빌딩 순위 보기 →
+          </button>
         </div>
       )}
 

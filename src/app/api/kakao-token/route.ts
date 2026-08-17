@@ -9,16 +9,18 @@ export async function POST(req: NextRequest) {
   if (!code) return NextResponse.json({ error: "no code" }, { status: 400 });
 
   // 서버에서 토큰 교환 (CORS 없음)
+  const params: Record<string, string> = {
+    grant_type: "authorization_code",
+    client_id: REST_API_KEY,
+    redirect_uri: REDIRECT_URI,
+    code,
+  };
+  if (CLIENT_SECRET) params.client_secret = CLIENT_SECRET;
+
   const tokenRes = await fetch("https://kauth.kakao.com/oauth/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "authorization_code",
-      client_id: REST_API_KEY,
-      client_secret: CLIENT_SECRET,
-      redirect_uri: REDIRECT_URI,
-      code,
-    }),
+    body: new URLSearchParams(params),
   });
   const tokenData = await tokenRes.json();
   if (!tokenData.access_token) {

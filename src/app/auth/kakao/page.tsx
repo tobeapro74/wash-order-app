@@ -31,8 +31,9 @@ function KakaoCallback() {
         const profileImage: string | undefined = data.profileImage || undefined;
 
         if (nickname) {
+          const isNew = !localStorage.getItem("wash_onboarded");
           saveUser({ kakaoId, nickname, profileImage });
-          router.replace("/today");
+          router.replace(isNew ? "/onboarding" : "/today");
         } else {
           sessionStorage.setItem("pending_kakao_id", kakaoId);
           if (profileImage) sessionStorage.setItem("pending_profile_image", profileImage);

@@ -28,7 +28,7 @@ export default function NicknamePage() {
     saveUser({ kakaoId, nickname: trimmed, profileImage });
     sessionStorage.removeItem("pending_kakao_id");
     sessionStorage.removeItem("pending_profile_image");
-    router.replace("/today");
+    router.replace("/onboarding");
   };
 
   return (

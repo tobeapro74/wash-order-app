@@ -130,78 +130,110 @@ export default function TodayPage() {
 
       {/* ══════════════ RESULT 화면 ══════════════ */}
       {phase === "result" && resultOrder && (
-        <div className="flex-1 flex flex-col items-center px-5 pb-28 gap-5"
-          style={{ paddingTop: 64 }}>
-          <div className="relative">
-            <Kaechi mood={isJoker ? "happy" : "normal"} size={110} />
-            {showConfetti && (
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-2 pointer-events-none">
-                {["🎉","✨","🎊","⭐","🎉"].map((e, i) => (
-                  <span key={i} className="confetti-particle text-xl"
-                    style={{ animationDelay: `${i * 0.1}s` }}>{e}</span>
-                ))}
-              </div>
-            )}
-          </div>
+        <div className="flex-1 flex flex-col items-center px-5 pb-28"
+          style={{ paddingTop: 24 }}>
 
-          <div className="w-full rounded-3xl p-6 text-center bounce-in"
+          {/* 타이틀 */}
+          <h1 className="text-center bounce-in"
+            style={{
+              fontSize: 38, fontWeight: 900,
+              color: "#1E2A22", lineHeight: 1.2,
+              letterSpacing: "-1px", marginBottom: 24,
+            }}>
+            오늘은<br/>어디부터 씻을까요?
+          </h1>
+
+          {/* 순서 카드 */}
+          <div className="w-full bounce-in"
             style={{
               background: isJoker ? "#FBEFC9" : "#D8F0E0",
-              boxShadow: "0 6px 16px rgba(31,110,66,0.12)",
+              borderRadius: 24,
+              padding: 24,
+              boxShadow: "0 6px 20px rgba(31,110,66,0.13)",
+              position: "relative",
+              marginBottom: 20,
             }}>
+
+            {/* 조커 배지 */}
             {isJoker && (
-              <p className="text-xs font-bold mb-3 tracking-widest" style={{ color: "#7C6FE0" }}>
+              <p className="text-center" style={{ fontSize: 12, fontWeight: 700, color: "#7C6FE0", letterSpacing: "0.1em", marginBottom: 8 }}>
                 ⭐ 나의 루틴 당첨!
               </p>
             )}
-            <div className="flex items-center justify-center gap-2 mb-4">
+
+            {/* 카드 내부 타이틀 */}
+            <p className="text-center"
+              style={{ fontSize: 15, fontWeight: 600, color: "#1E2A22", marginBottom: 16 }}>
+              오늘의 씻기 순서
+            </p>
+
+            {/* 2×2 그리드 + 마스코트 + 점선 화살표 */}
+            <div style={{ position: "relative", width: "100%", paddingBottom: "80%", marginBottom: 8 }}>
+              <DottedArrow />
+
               {resultOrder.map((id, i) => {
-                const el = WASH_ELEMENTS.find(e => e.id === id)!;
+                const el  = WASH_ELEMENTS.find(e => e.id === id)!;
+                const pos = GRID_POS[i];
+                const isRight = "right" in pos;
                 return (
-                  <span key={id} className="flex items-center gap-2">
-                    <span className="flex flex-col items-center gap-1">
-                      <Image src={WASH_CHAR[id]} alt={el.label}
-                        width={64} height={64} style={{ objectFit: "contain" }} />
-                      <span className="text-xs font-semibold" style={{ color: "#1E2A22" }}>
-                        {el.label}
-                      </span>
+                  <div key={id}
+                    className="absolute flex flex-col items-center"
+                    style={{ ...pos, transform: isRight ? "translateX(50%)" : "translateX(-50%)", gap: 4 }}>
+                    <Image src={WASH_CHAR[id]} alt={el.label}
+                      width={88} height={88} style={{ objectFit: "contain" }} />
+                    <span style={{ fontSize: 14, fontWeight: 600, color: "#1E2A22" }}>
+                      {el.label}
                     </span>
-                    {i < resultOrder.length - 1 && (
-                      <span style={{ fontSize: 18, color: "#3FA96B" }}>→</span>
-                    )}
-                  </span>
+                  </div>
                 );
               })}
+
+              {/* 중앙 마스코트 + 컨페티 */}
+              <div className="absolute" style={{ top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 2 }}>
+                {showConfetti && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-1 pointer-events-none" style={{ zIndex: 3 }}>
+                    {["🎉","✨","🎊","⭐","🎉"].map((e, i) => (
+                      <span key={i} className="confetti-particle text-base"
+                        style={{ animationDelay: `${i * 0.1}s` }}>{e}</span>
+                    ))}
+                  </div>
+                )}
+                <Kaechi mood={isJoker ? "happy" : "wave"} size={120} animate={false} />
+              </div>
             </div>
-            <p className="text-sm italic" style={{ color: "#5C6B60" }}>"{copy}"</p>
+
+            {/* 카피 문구 */}
+            <p className="text-center" style={{ fontSize: 13, color: "#5C6B60", fontStyle: "italic" }}>
+              "{copy}"
+            </p>
           </div>
 
+          {/* 좋아요 / 싫어요 버튼 */}
           <div className="w-full flex gap-3">
             <button onClick={handleLike}
-              className="flex-1 py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 active:scale-95 transition-transform"
+              className="flex-1 active:scale-95 transition-transform"
               style={{
+                height: 56, borderRadius: 999,
                 background: "linear-gradient(180deg,#4CBE7C 0%,#2E8C56 100%)",
-                color: "#fff",
+                color: "#fff", fontSize: 16, fontWeight: 700,
                 boxShadow: "0 6px 18px rgba(46,140,86,0.3)",
+                border: "none", cursor: "pointer",
               }}>
               👍 좋아요
             </button>
             <button onClick={() => setShowDislike(true)}
-              className="flex-1 py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 active:scale-95 transition-transform"
+              className="flex-1 active:scale-95 transition-transform"
               style={{
-                background: "#fff",
-                color: "#1E2A22",
+                height: 56, borderRadius: 999,
+                background: "#fff", color: "#1E2A22",
+                fontSize: 16, fontWeight: 700,
                 border: "2px solid #D8F0E0",
                 boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+                cursor: "pointer",
               }}>
               👎 싫어요
             </button>
           </div>
-
-          <button onClick={() => router.push("/building")}
-            className="text-sm font-bold" style={{ color: "#3FA96B" }}>
-            빌딩 순위 보기 →
-          </button>
         </div>
       )}
 

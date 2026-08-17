@@ -65,7 +65,7 @@ export function BottomNav() {
             <button
               key={tab.href}
               onClick={() => router.push(tab.href)}
-              className="flex flex-1 flex-col items-center gap-0.5 py-2 transition-colors"
+              className="flex flex-1 flex-col items-center gap-0.5 py-3.5 transition-colors"
             >
               {active ? (
                 /* 활성: pill 캡슐 — 라벨만, 아이콘 없음 */

@@ -15,8 +15,8 @@ import Image from "next/image";
 
 // 층별 블록 폭: 상층(23층)이 230px, 내려갈수록 6px씩 넓어짐
 function widthForFloor(floor: number, topFloor: number = 23): number {
-  const base = 230;
-  const step = 6;
+  const base = 200;
+  const step = 20;
   return base + (topFloor - floor) * step;
 }
 

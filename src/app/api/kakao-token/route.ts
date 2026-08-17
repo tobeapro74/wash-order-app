@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const REST_API_KEY = "36794df87998cd398c837ba4c6c43b4d";
-const REDIRECT_URI = "https://main.d1qohqt5mb5sln.amplifyapp.com/auth/kakao";
+const REST_API_KEY  = "36794df87998cd398c837ba4c6c43b4d";
+const CLIENT_SECRET = process.env.KAKAO_CLIENT_SECRET ?? "";
+const REDIRECT_URI  = "https://main.d1qohqt5mb5sln.amplifyapp.com/auth/kakao";
 
 export async function POST(req: NextRequest) {
   const { code } = await req.json();
@@ -14,6 +15,7 @@ export async function POST(req: NextRequest) {
     body: new URLSearchParams({
       grant_type: "authorization_code",
       client_id: REST_API_KEY,
+      client_secret: CLIENT_SECRET,
       redirect_uri: REDIRECT_URI,
       code,
     }),

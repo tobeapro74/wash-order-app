@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { loadUser } from "@/lib/auth";
 import { Kaechi } from "@/components/Kaechi";
 
-const KAKAO_JS_KEY  = "8cefe9fe0a51a3cb8f0b0f23cbb7e18d";
-const REDIRECT_URI  = "https://main.d1qohqt5mb5sln.amplifyapp.com/auth/kakao";
+const KAKAO_REST_KEY = "36794df87998cd398c837ba4c6c43b4d";
+const REDIRECT_URI   = "https://main.d1qohqt5mb5sln.amplifyapp.com/auth/kakao";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,7 +20,7 @@ export default function LoginPage() {
     setLoading(true);
     // 팝업 없이 카카오 OAuth 페이지로 직접 이동 (리다이렉트 방식)
     const params = new URLSearchParams({
-      client_id: KAKAO_JS_KEY,
+      client_id: KAKAO_REST_KEY,
       redirect_uri: REDIRECT_URI,
       response_type: "code",
     });

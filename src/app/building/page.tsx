@@ -14,10 +14,14 @@ import { BottomNav } from "@/components/BottomNav";
 import Image from "next/image";
 
 // 층별 블록 폭: 상층(23층)이 230px, 내려갈수록 6px씩 넓어짐
-function widthForFloor(floor: number, topFloor: number = 23): number {
-  const base = 200;
-  const step = 20;
-  return base + (topFloor - floor) * step;
+// 최상층=화면폭의 55%, 최하층=화면폭의 90% 사이를 균등 분배
+// 화면폭은 320~430px 사이로 클램프 (모바일 기준)
+function widthForFloor(floor: number, topFloor: number): number {
+  const vw = Math.min(Math.max(typeof window !== "undefined" ? window.innerWidth : 375, 320), 430);
+  const minW = Math.round(vw * 0.55);
+  const maxW = Math.round(vw * 0.90);
+  if (topFloor <= 1) return minW;
+  return Math.round(minW + ((topFloor - floor) / (topFloor - 1)) * (maxW - minW));
 }
 
 export default function BuildingPage() {

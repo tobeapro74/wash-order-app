@@ -55,6 +55,7 @@ export function BottomNav() {
         borderTop: "1px solid #EDEDED",
         paddingBottom: "env(safe-area-inset-bottom)",
         boxShadow: "0 -2px 12px rgba(0,0,0,0.05)",
+        minHeight: 72,
       }}
     >
       <div className="flex items-center justify-around">
@@ -65,7 +66,8 @@ export function BottomNav() {
             <button
               key={tab.href}
               onClick={() => router.push(tab.href)}
-              className="flex flex-1 flex-col items-center gap-0.5 py-3.5 transition-colors"
+              className="flex flex-1 flex-col items-center gap-1 transition-colors"
+              style={{ paddingTop: 14, paddingBottom: 14 }}
             >
               {active ? (
                 /* 활성: pill 캡슐 — 라벨만, 아이콘 없음 */

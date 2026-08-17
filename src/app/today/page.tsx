@@ -256,7 +256,7 @@ export default function TodayPage() {
           <div className="bounce-in" style={{
             width: "100%",
             borderRadius: 28,
-            padding: "28px 24px",
+            padding: "24px 16px",
             background: isJoker
               ? "linear-gradient(180deg,#FBEFC9 0%,#F7E8B8 100%)"
               : "linear-gradient(180deg,#FFFFFF 0%,#D8F0E0 100%)",
@@ -266,14 +266,17 @@ export default function TodayPage() {
             {/* 카드 타이틀 */}
             <p style={{
               textAlign: "center", fontSize: 18, fontWeight: 800,
-              color: "#1E2A22", marginBottom: 20,
+              color: "#1E2A22", marginBottom: 16,
               letterSpacing: "-0.3px",
             }}>
               {isJoker ? "⭐ 나의 루틴 당첨!" : "4단 세탁 순서"}
             </p>
 
-            {/* 가로 4단 아이콘 로우 */}
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+            {/* 가로 4단 아이콘 로우 — 아이콘 54px + 화살표 22px × 3 = 270px (여유 있음) */}
+            <div style={{
+              display: "flex", alignItems: "flex-start",
+              justifyContent: "center", gap: 0,
+            }}>
               {resultOrder.map((id, i) => {
                 const el = WASH_ELEMENTS.find(e => e.id === id)!;
                 return (
@@ -281,29 +284,29 @@ export default function TodayPage() {
                     {/* 아이콘 + 라벨 */}
                     <div style={{
                       display: "flex", flexDirection: "column",
-                      alignItems: "center", gap: 8, flexShrink: 0,
+                      alignItems: "center", gap: 6, flexShrink: 0, width: 60,
                     }}>
                       <div style={{
-                        width: 64, height: 64, borderRadius: "50%",
+                        width: 54, height: 54, borderRadius: "50%",
                         background: "#D8F0E0",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         boxShadow: "inset 0 2px 4px rgba(0,0,0,0.04)",
                       }}>
                         <Image src={WASH_CHAR[id]} alt={el.label}
-                          width={52} height={52} style={{ objectFit: "contain" }} />
+                          width={44} height={44} style={{ objectFit: "contain" }} />
                       </div>
-                      <span style={{ fontSize: 15, fontWeight: 600, color: "#1E2A22" }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "#1E2A22" }}>
                         {el.label}
                       </span>
                     </div>
-                    {/* 아이콘 사이 곡선 점선 화살표 */}
+                    {/* 곡선 점선 화살표 */}
                     {i < resultOrder.length - 1 && (
-                      <svg width="32" height="28" viewBox="0 0 32 28"
-                        style={{ flexShrink: 0, marginTop: 12 }}>
-                        <path d="M2 22 Q16 -4 30 22"
+                      <svg width="22" height="24" viewBox="0 0 22 24"
+                        style={{ flexShrink: 0, marginTop: 15 }}>
+                        <path d="M2 19 Q11 -2 20 19"
                           stroke="#9B8FD4" strokeWidth="2"
-                          strokeDasharray="3 4" strokeLinecap="round" fill="none" />
-                        <path d="M26 19 L30 22 L27 26"
+                          strokeDasharray="3 3" strokeLinecap="round" fill="none" />
+                        <path d="M17 16 L20 19 L17 22"
                           stroke="#9B8FD4" strokeWidth="2"
                           strokeLinecap="round" strokeLinejoin="round" fill="none" />
                       </svg>

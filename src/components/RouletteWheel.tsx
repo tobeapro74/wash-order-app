@@ -8,16 +8,14 @@ interface RouletteWheelProps {
   onResult: (order: ElementId[], isJoker: boolean) => void;
 }
 
-// 섹터 순서: 좌상(양치)→우상(세수)→우하(몸)→좌하(머리감기) = 0°기준 시계방향
-// 포인터가 12시(top)에 있으므로 상단에 걸리는 칸이 결과
 const SEGMENTS = [
-  { id: "teeth" as ElementId, label: "양치",   img: "/char-teeth.png", bg: "#DCD6F5" }, // lavender200
-  { id: "face"  as ElementId, label: "세수",   img: "/char-face.png",  bg: "#F7CFE0" }, // pink200
-  { id: "body"  as ElementId, label: "몸",     img: "/char-body.png",  bg: "#FBEFC9" }, // cream200
-  { id: "hair"  as ElementId, label: "머리감기", img: "/char-hair.png",  bg: "#C7ECD9" }, // mint200
+  { id: "teeth" as ElementId, label: "양치",    img: "/char-teeth.png", bg: "#DCD6F5" }, // lavender
+  { id: "face"  as ElementId, label: "세수",    img: "/char-face.png",  bg: "#F7CFE0" }, // pink
+  { id: "body"  as ElementId, label: "몸",      img: "/char-body.png",  bg: "#FBEFC9" }, // cream
+  { id: "hair"  as ElementId, label: "머리감기", img: "/char-hair.png",  bg: "#C7ECD9" }, // mint
 ];
 
-const SECTION_DEG  = 90;
+const SECTION_DEG   = 90;
 const SPIN_DURATION = 4200;
 const RESULT_DELAY  = 1000;
 
@@ -45,7 +43,6 @@ export function RouletteWheel({ myOrder, onResult }: RouletteWheelProps) {
       ? SEGMENTS.findIndex(s => s.id === myOrder![0])
       : Math.floor(Math.random() * 4);
 
-    // 포인터가 12시 → 해당 섹터가 12시에 오도록
     const targetAngle = targetIdx * SECTION_DEG + SECTION_DEG / 2;
     const spins       = 5 + Math.floor(Math.random() * 3);
     const newRotation = rotation + 360 * spins + (360 - targetAngle);
@@ -64,17 +61,17 @@ export function RouletteWheel({ myOrder, onResult }: RouletteWheelProps) {
   };
 
   /* ── SVG 수치 ── */
-  const S      = 280;   // SVG 전체 크기
+  const S      = 290;
   const cx     = S / 2;
   const cy     = S / 2;
-  const outerR = 118;   // 섹터 바깥 반지름
-  const innerR = 42;    // 중심 원 반지름
-  const rimR   = outerR + 8;   // 외곽 링 반지름
-  const dotR   = outerR + 17;  // LED 비드 반지름
+  const outerR = 122;   // 섹터 바깥 반지름
+  const innerR = 44;    // 중심 원 반지름
+  const rimR   = outerR + 7;    // 외곽 링 안쪽 (흰 테두리)
+  const ringR  = outerR + 18;   // LED 비드 링 반지름
+  const dotR   = outerR + 14;   // LED 비드 위치
 
   const rad = (d: number) => (d * Math.PI) / 180;
 
-  // 섹터 path (도넛 형태)
   function segPath(i: number) {
     const a1 = rad(i * SECTION_DEG - 90);
     const a2 = rad((i + 1) * SECTION_DEG - 90);
@@ -92,194 +89,219 @@ export function RouletteWheel({ myOrder, onResult }: RouletteWheelProps) {
     return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
   }
 
-  const imgR   = outerR - 44; // 캐릭터 이미지 중심
-  const textR  = outerR - 14; // 라벨 텍스트 중심
-  const imgSz  = 48;
+  const imgR  = outerR - 44;
+  const textR = outerR - 14;
+  const imgSz = 52;
 
-  // LED 비드 12개
-  const ledDots = Array.from({ length: 12 }, (_, i) => {
-    const a = rad(i * 30 - 90);
+  // LED 비드 16개
+  const ledDots = Array.from({ length: 16 }, (_, i) => {
+    const a = rad(i * (360 / 16) - 90);
     return { x: cx + dotR * Math.cos(a), y: cy + dotR * Math.sin(a) };
   });
 
-  // 섹터 텍스트 색 (배경에 따라)
-  const textColors = ["#4A3070", "#7C2A4A", "#6B5020", "#1F6E42"];
+  const textColors = ["#5B4FAD", "#8B3A5A", "#7A5A20", "#1F6E42"];
 
   return (
     <div className="flex flex-col items-center w-full">
-      {/* 룰렛 컨테이너 카드 */}
-      <div className="w-full rounded-3xl flex flex-col items-center"
+      {/* 룰렛 컨테이너 카드 — 연한 민트 배경 */}
+      <div className="w-full rounded-[28px] flex flex-col items-center"
         style={{
-          background: "linear-gradient(160deg,#9FE0B8 0%,#C7ECD9 100%)",
-          boxShadow: "0 6px 16px rgba(31,110,66,0.18)",
-          padding: "24px 16px 28px",
+          background: "linear-gradient(160deg, #C7ECD9 0%, #D8F0E0 100%)",
+          boxShadow: "0 8px 32px rgba(31,110,66,0.13)",
+          padding: "28px 20px 32px",
+          position: "relative",
+          overflow: "hidden",
         }}>
 
-        {/* 포인터 + 휠을 relative 컨테이너로 묶음 */}
-        <div style={{ position: "relative", width: S, height: S + 16 }}>
+        {/* 비눗방울 장식 (좌상단) */}
+        <div style={{ position: "absolute", top: 20, left: 20, pointerEvents: "none" }}>
+          <svg width="56" height="52" viewBox="0 0 56 52" fill="none">
+            {/* 큰 비눗방울 */}
+            <circle cx="22" cy="28" r="18" fill="none" stroke="rgba(180,220,200,0.6)" strokeWidth="2"/>
+            <ellipse cx="16" cy="20" rx="6" ry="4" fill="rgba(255,255,255,0.45)" transform="rotate(-20,16,20)"/>
+            {/* 중간 */}
+            <circle cx="42" cy="18" r="10" fill="none" stroke="rgba(160,210,190,0.5)" strokeWidth="1.5"/>
+            <ellipse cx="38" cy="14" rx="3" ry="2" fill="rgba(255,255,255,0.4)" transform="rotate(-15,38,14)"/>
+            {/* 물방울들 */}
+            <ellipse cx="44" cy="38" rx="4" ry="6" fill="rgba(160,220,200,0.5)" transform="rotate(10,44,38)"/>
+            <ellipse cx="8"  cy="10" rx="3" ry="4.5" fill="rgba(200,230,220,0.45)" transform="rotate(-5,8,10)"/>
+          </svg>
+        </div>
 
-          {/* 포인터 (물방울 핀, 12시) */}
+        {/* 포인터 + 휠 */}
+        <div style={{ position: "relative", width: S, height: S + 20 }}>
+
+          {/* 포인터 (입체 핀) */}
           <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}>
-            <svg width="32" height="40" viewBox="0 0 32 40">
+            <svg width="38" height="48" viewBox="0 0 38 48">
               <defs>
-                <radialGradient id="pinGrad" cx="40%" cy="30%" r="60%">
-                  <stop offset="0%" stopColor="#FF8080"/>
-                  <stop offset="100%" stopColor="#E8544A"/>
+                <radialGradient id="pinG" cx="38%" cy="28%" r="65%">
+                  <stop offset="0%"   stopColor="#FF8A8A"/>
+                  <stop offset="100%" stopColor="#D93025"/>
                 </radialGradient>
               </defs>
-              <ellipse cx="16" cy="14" rx="13" ry="13" fill="url(#pinGrad)" />
-              <ellipse cx="12" cy="10" rx="5" ry="4" fill="white" opacity="0.45" />
-              <ellipse cx="16" cy="14" rx="4"  ry="4"  fill="white" opacity="0.25" />
-              <polygon points="16,40 5,22 27,22" fill="url(#pinGrad)" />
+              {/* 핀 그림자 */}
+              <ellipse cx="19" cy="46" rx="8" ry="3" fill="rgba(0,0,0,0.12)"/>
+              {/* 핀 원형 본체 */}
+              <circle cx="19" cy="16" r="15" fill="url(#pinG)"/>
+              {/* 하이라이트 */}
+              <ellipse cx="13" cy="10" rx="6" ry="4" fill="white" opacity="0.38" transform="rotate(-20,13,10)"/>
+              {/* 내부 흰 점 */}
+              <circle cx="19" cy="16" r="5" fill="white" opacity="0.22"/>
+              {/* 핀 꼬리 */}
+              <polygon points="19,48 7,26 31,26" fill="url(#pinG)"/>
             </svg>
           </div>
 
           {/* 룰렛 휠 */}
-          <div
-            style={{
-              position: "absolute",
-              top: 16,
-              left: 0,
-              width: S,
-              height: S,
-              transform: `rotate(${rotation}deg)`,
-              transition: isSpinning
-                ? `transform ${SPIN_DURATION}ms cubic-bezier(0.17,0.67,0.12,0.99)`
-                : "none",
-            }}>
+          <div style={{
+            position: "absolute",
+            top: 20,
+            left: 0,
+            width: S,
+            height: S,
+            transform: `rotate(${rotation}deg)`,
+            transition: isSpinning
+              ? `transform ${SPIN_DURATION}ms cubic-bezier(0.17,0.67,0.12,0.99)`
+              : "none",
+          }}>
             <svg viewBox={`0 0 ${S} ${S}`} width={S} height={S}>
               <defs>
-                {/* 외곽 링 그라데이션 */}
-                <radialGradient id="ringGrad" cx="50%" cy="50%" r="50%">
-                  <stop offset="70%"  stopColor="#7BC9A0"/>
-                  <stop offset="100%" stopColor="#3FA96B"/>
+                {/* 외곽 링: 연한 민트 */}
+                <radialGradient id="outerRing" cx="50%" cy="50%" r="50%">
+                  <stop offset="75%"  stopColor="#A8D8BE"/>
+                  <stop offset="100%" stopColor="#7BC4A0"/>
                 </radialGradient>
-                {/* LED 비드 글로시 */}
-                <radialGradient id="ledGold" cx="30%" cy="30%" r="70%">
-                  <stop offset="0%"   stopColor="#FFE580"/>
-                  <stop offset="100%" stopColor="#F5C84B"/>
+                {/* LED 골드 */}
+                <radialGradient id="ledG" cx="30%" cy="30%" r="70%">
+                  <stop offset="0%"   stopColor="#FFFBE0"/>
+                  <stop offset="100%" stopColor="#E8C060"/>
                 </radialGradient>
-                <radialGradient id="ledWhite" cx="30%" cy="30%" r="70%">
+                {/* LED 흰색 */}
+                <radialGradient id="ledW" cx="30%" cy="30%" r="70%">
                   <stop offset="0%"   stopColor="#FFFFFF"/>
-                  <stop offset="100%" stopColor="#C0D8C8"/>
+                  <stop offset="100%" stopColor="#D0EAD8"/>
                 </radialGradient>
-                <filter id="ledGlow">
-                  <feGaussianBlur stdDeviation="1.5" result="blur"/>
-                  <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                {/* GO 버튼 골드 링 */}
+                <linearGradient id="goldRing" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%"   stopColor="#FCE18A"/>
+                  <stop offset="60%"  stopColor="#F5C84B"/>
+                  <stop offset="100%" stopColor="#C89518"/>
+                </linearGradient>
+                {/* GO 버튼 내부 민트 */}
+                <linearGradient id="goBtnGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%"   stopColor="#8DDAB0"/>
+                  <stop offset="100%" stopColor="#5BAF7A"/>
+                </linearGradient>
+                <linearGradient id="goBtnGray" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%"   stopColor="#B0BEC5"/>
+                  <stop offset="100%" stopColor="#78909C"/>
+                </linearGradient>
+                <filter id="ledShadow">
+                  <feDropShadow dx="0" dy="0" stdDeviation="2" floodColor="rgba(255,255,200,0.5)"/>
                 </filter>
               </defs>
 
               {/* 외곽 링 */}
-              <circle cx={cx} cy={cy} r={dotR + 9} fill="url(#ringGrad)" />
+              <circle cx={cx} cy={cy} r={ringR} fill="url(#outerRing)"/>
 
-              {/* LED 비드 */}
+              {/* LED 비드 16개 */}
               {ledDots.map((d, i) => (
-                <circle key={i} cx={d.x} cy={d.y} r={6}
-                  fill={i % 2 === 0 ? "url(#ledGold)" : "url(#ledWhite)"}
-                  filter="url(#ledGlow)" opacity={0.95} />
+                <circle key={i} cx={d.x} cy={d.y} r={6.5}
+                  fill={i % 2 === 0 ? "url(#ledG)" : "url(#ledW)"}
+                  filter="url(#ledShadow)"
+                  opacity={0.95}/>
               ))}
 
-              {/* 흰 링 (섹터 바깥 테두리) */}
-              <circle cx={cx} cy={cy} r={rimR} fill="white" />
+              {/* 흰 테두리 링 */}
+              <circle cx={cx} cy={cy} r={rimR} fill="white"/>
 
               {/* 4색 섹터 */}
               {SEGMENTS.map((seg, i) => {
-                const ePos = mid(i, imgR);
-                const lPos = mid(i, textR);
+                const ePos  = mid(i, imgR);
+                const lPos  = mid(i, textR);
                 const angle = i * SECTION_DEG + SECTION_DEG / 2;
                 return (
                   <g key={seg.id}>
-                    <path d={segPath(i)} fill={seg.bg} stroke="white" strokeWidth="3" />
-
-                    {/* 캐릭터 이미지 */}
+                    <path d={segPath(i)} fill={seg.bg} stroke="white" strokeWidth="3"/>
                     <image
                       href={seg.img}
                       x={ePos.x - imgSz / 2} y={ePos.y - imgSz / 2}
                       width={imgSz} height={imgSz}
-                      transform={`rotate(${angle}, ${ePos.x}, ${ePos.y})`}
-                      preserveAspectRatio="xMidYMid meet"
-                    />
-
-                    {/* 라벨 */}
+                      transform={`rotate(${angle},${ePos.x},${ePos.y})`}
+                      preserveAspectRatio="xMidYMid meet"/>
                     <text
                       x={lPos.x} y={lPos.y}
                       textAnchor="middle" dominantBaseline="middle"
-                      fontSize="11" fontWeight="700"
+                      fontSize="12" fontWeight="700"
                       fill={textColors[i]}
-                      transform={`rotate(${angle}, ${lPos.x}, ${lPos.y})`}
-                      style={{ fontFamily: "'Apple SD Gothic Neo','Noto Sans KR',sans-serif" }}>
+                      transform={`rotate(${angle},${lPos.x},${lPos.y})`}
+                      style={{ fontFamily:"'Apple SD Gothic Neo','Noto Sans KR',sans-serif" }}>
                       {seg.label}
                     </text>
-
-                    {/* 섹터 구분선 */}
                     <line
                       x1={cx + innerR * Math.cos(rad(i * SECTION_DEG - 90))}
                       y1={cy + innerR * Math.sin(rad(i * SECTION_DEG - 90))}
                       x2={cx + outerR * Math.cos(rad(i * SECTION_DEG - 90))}
                       y2={cy + outerR * Math.sin(rad(i * SECTION_DEG - 90))}
-                      stroke="white" strokeWidth="3" />
+                      stroke="white" strokeWidth="3"/>
                   </g>
                 );
               })}
 
-              {/* 중심 원 베이스 */}
-              <circle cx={cx} cy={cy} r={innerR + 6} fill="white" />
-              <circle cx={cx} cy={cy} r={innerR + 2} fill="#D8F0E0" stroke="#9FE0B8" strokeWidth="2" />
+              {/* 중심 흰 원 */}
+              <circle cx={cx} cy={cy} r={innerR + 8} fill="white"/>
+              {/* 골드 링 */}
+              <circle cx={cx} cy={cy} r={innerR + 6} fill="url(#goldRing)"/>
+              {/* GO 버튼 내부 */}
+              <circle cx={cx} cy={cy} r={innerR}
+                fill={(isSpinning || isStopped) ? "url(#goBtnGray)" : "url(#goBtnGrad)"}/>
+              {/* 하이라이트 */}
+              <ellipse cx={cx - 8} cy={cy - 12} rx={14} ry={9}
+                fill="white" opacity="0.25" transform={`rotate(-20,${cx-8},${cy-12})`}/>
             </svg>
           </div>
 
-          {/* GO 버튼 — 정중앙 */}
+          {/* GO 버튼 텍스트 오버레이 (클릭 영역) */}
           <div onClick={spin}
             style={{
               position: "absolute",
-              top: 16 + S / 2 - 52,
-              left: S / 2 - 52,
+              top: 20 + S / 2 - innerR - 2,
+              left: S / 2 - innerR - 2,
+              width: (innerR + 2) * 2,
+              height: (innerR + 2) * 2,
+              borderRadius: "50%",
               zIndex: 20,
               cursor: (isSpinning || isStopped) ? "not-allowed" : "pointer",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 0,
             }}>
-            <svg viewBox="0 0 104 104" width={104} height={104}>
-              <defs>
-                {/* 골드 링 */}
-                <linearGradient id="goldRing" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%"   stopColor="#FCE18A"/>
-                  <stop offset="60%"  stopColor="#F5C84B"/>
-                  <stop offset="100%" stopColor="#D89B1F"/>
-                </linearGradient>
-                {/* 내부 그린 */}
-                <linearGradient id="goGreen" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%"   stopColor="#4CBE7C"/>
-                  <stop offset="100%" stopColor="#2E8C56"/>
-                </linearGradient>
-                <linearGradient id="goGray" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%"   stopColor="#9CA3AF"/>
-                  <stop offset="100%" stopColor="#6B7280"/>
-                </linearGradient>
-              </defs>
-              {/* 골드 링 */}
-              <circle cx="52" cy="56" r="46" fill="rgba(0,0,0,0.12)" />
-              <circle cx="52" cy="52" r="46" fill="url(#goldRing)" />
-              {/* 내부 버튼 */}
-              <circle cx="52" cy="52" r="38"
-                fill={(isSpinning || isStopped) ? "url(#goGray)" : "url(#goGreen)"} />
-              {/* 하이라이트 */}
-              <ellipse cx="44" cy="36" rx="14" ry="8" fill="white" opacity="0.22" />
-              {/* 텍스트 */}
-              <text x="52" y="48" textAnchor="middle" dominantBaseline="middle"
-                fontSize="18" fontWeight="900" fill="white"
-                style={{ fontFamily: "'Apple SD Gothic Neo','Noto Sans KR',sans-serif" }}>
-                {isSpinning ? "🌀" : isStopped ? "✅" : "GO!"}
-              </text>
-              <text x="52" y="65" textAnchor="middle" dominantBaseline="middle"
-                fontSize="10" fill="rgba(255,255,255,0.8)"
-                style={{ fontFamily: "'Apple SD Gothic Neo','Noto Sans KR',sans-serif" }}>
-                {isSpinning ? "고르는중" : isStopped ? "완료!" : "돌리기"}
-              </text>
-            </svg>
+            <span style={{
+              fontSize: 18,
+              fontWeight: 900,
+              color: "white",
+              fontFamily: "'Apple SD Gothic Neo','Noto Sans KR',sans-serif",
+              lineHeight: 1.1,
+              textShadow: "0 1px 4px rgba(0,0,0,0.18)",
+            }}>
+              {isSpinning ? "🌀" : isStopped ? "✅" : "GO!"}
+            </span>
+            <span style={{
+              fontSize: 10,
+              color: "rgba(255,255,255,0.82)",
+              fontFamily: "'Apple SD Gothic Neo','Noto Sans KR',sans-serif",
+              fontWeight: 500,
+            }}>
+              {isSpinning ? "고르는중" : isStopped ? "완료!" : "돌리기"}
+            </span>
           </div>
         </div>
 
         {/* 안내 문구 */}
-        <p className="text-center text-xs mt-4" style={{ color: "#1F6E42", opacity: 0.7 }}>
+        <p className="text-center text-xs mt-2" style={{ color: "#2E8C56", opacity: 0.75 }}>
           {isSpinning
             ? "씻기 요정이 고르는 중이에요... ✨"
             : isStopped

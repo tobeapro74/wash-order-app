@@ -1,114 +1,90 @@
 @import "tailwindcss";
 
 :root {
-  /* 앱아이콘 톤앤매너: 민트 그린 계열 */
-  --primary: #5BAF7A;        /* 세이지 그린 메인 */
-  --primary-dark: #3D8A5C;   /* 진한 그린 (헤더) */
-  --primary-light: #E8F5EE;  /* 연한 민트 (배경) */
-  --primary-mid: #C2E4CF;    /* 중간 민트 (테두리/구분선) */
-
-  --accent: #7B5EA7;         /* 보라 포인트 */
-  --accent-light: #EDE8F5;   /* 연보라 배경 */
-
-  --yellow: #F5C842;         /* 캐릭터 노랑 */
-  --yellow-light: #FFF8D6;   /* 연노랑 배경 */
-
-  --surface: #FFFFFF;        /* 카드 배경 */
-  --surface-2: #F2FAF5;      /* 서브 배경 */
-  --border: #C2E4CF;         /* 테두리 */
-
-  --text: #2D3A2E;           /* 본문 텍스트 */
-  --text-sub: #4A6350;       /* 서브 텍스트 */
-  --text-muted: #8FAF97;     /* 흐린 텍스트 */
-
-  --ok: #4CAF7A;             /* 좋아요 그린 */
-  --ok-light: #E0F5EA;
-  --bad: #E05A5A;            /* 싫어요 레드 */
-  --bad-light: #FDEAEA;
+  /* Design Tokens — 씻기순서 리디자인 */
+  --mint50:       #EAF7EE;
+  --mint100:      #D8F0E0;
+  --mint200:      #C7ECD9;
+  --mint300:      #9FE0B8;
+  --green500:     #3FA96B;
+  --green600:     #2E8C56;
+  --green700:     #1F6E42;
+  --gold400:      #F5C84B;
+  --gold600:      #D89B1F;
+  --purple500:    #7C6FE0;
+  --pink200:      #F7CFE0;
+  --lavender200:  #DCD6F5;
+  --cream200:     #FBEFC9;
+  --ink900:       #1E2A22;
+  --ink500:       #5C6B60;
+  --white:        #FFFFFF;
 
   /* 하위 호환 */
-  --toss-blue: #5BAF7A;
-  --toss-blue-light: #E8F5EE;
-  --toss-bg: #F2FAF5;
-  --toss-surface: #F2FAF5;
-  --toss-border: #C2E4CF;
-  --toss-text: #2D3A2E;
-  --toss-text-sub: #4A6350;
-  --toss-text-muted: #8FAF97;
-  --toss-yellow: #F5C842;
-  --toss-yellow-light: #FFF8D6;
-  --toss-green: #4CAF7A;
-  --toss-green-light: #E0F5EA;
-  --toss-red: #E05A5A;
-  --toss-red-light: #FDEAEA;
+  --primary:        var(--green500);
+  --primary-dark:   var(--green700);
+  --primary-light:  var(--mint50);
+  --surface:        var(--white);
+  --text:           var(--ink900);
+  --text-sub:       var(--ink500);
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
   height: 100%;
-  font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', -apple-system, sans-serif;
-  background: var(--primary-light);
-  color: var(--text);
+  font-family: 'Pretendard Variable', 'Pretendard', 'Apple SD Gothic Neo',
+    'Noto Sans KR', 'Malgun Gothic', -apple-system, sans-serif;
+  background: linear-gradient(180deg, #EAF7EE 0%, #D8F0E0 45%, #C7ECD9 100%);
+  background-attachment: fixed;
+  color: var(--ink900);
   -webkit-font-smoothing: antialiased;
 }
 
-#__next, main {
-  min-height: 100dvh;
-}
+#__next, main { min-height: 100dvh; }
 
+/* ── 공통 애니메이션 ── */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
+  50%       { transform: translateY(-7px); }
 }
-
 @keyframes pop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.15); }
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.15); }
   100% { transform: scale(1); }
 }
-
-@keyframes confetti-fall {
-  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(80px) rotate(360deg); opacity: 0; }
-}
-
-.kaechi-float {
-  animation: float 2.8s ease-in-out infinite;
-}
-
-.kaechi-pop {
-  animation: pop 0.4s ease-out;
-}
-
-.confetti-particle {
-  animation: confetti-fall 0.8s ease-out forwards;
-}
-
 @keyframes bounce-in {
-  0% { transform: scale(0.7) translateY(20px); opacity: 0; }
-  60% { transform: scale(1.08) translateY(-4px); opacity: 1; }
-  100% { transform: scale(1) translateY(0); opacity: 1; }
+  0%   { transform: scale(0.72) translateY(18px); opacity: 0; }
+  60%  { transform: scale(1.06) translateY(-4px);  opacity: 1; }
+  100% { transform: scale(1)    translateY(0);      opacity: 1; }
 }
 @keyframes fade-up {
-  from { transform: translateY(16px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from { transform: translateY(14px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
 }
-@keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
+@keyframes confetti-fall {
+  0%   { transform: translateY(-20px) rotate(0deg);   opacity: 1; }
+  100% { transform: translateY(80px)  rotate(360deg); opacity: 0; }
 }
-.bounce-in { animation: bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
-.fade-up { animation: fade-up 0.4s ease-out forwards; }
-.btn-3d {
-  position: relative;
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 14px 2px rgba(63,169,107,0.55); }
+  50%       { box-shadow: 0 0 22px 6px rgba(63,169,107,0.75); }
+}
+
+.kaechi-float    { animation: float 2.8s ease-in-out infinite; }
+.kaechi-pop      { animation: pop 0.4s ease-out; }
+.confetti-particle { animation: confetti-fall 0.8s ease-out forwards; }
+.bounce-in       { animation: bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+.fade-up         { animation: fade-up 0.4s ease-out both; }
+.glow-active     { animation: glow-pulse 1.8s ease-in-out infinite; }
+
+/* 3D 버튼 */
+.btn-primary {
+  background: linear-gradient(180deg, #4CBE7C 0%, #2E8C56 100%);
+  box-shadow: 0 8px 20px rgba(46,140,86,0.35);
+  border-radius: 999px;
   transition: transform 0.1s, box-shadow 0.1s;
 }
-.btn-3d:active {
-  transform: translateY(3px);
-  box-shadow: none !important;
+.btn-primary:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 8px rgba(46,140,86,0.2);
 }

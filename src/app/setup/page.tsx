@@ -50,7 +50,7 @@ export default function SetupPage() {
         style={{ background: "linear-gradient(180deg,#EAF7EE 0%,#D8F0E0 45%,#C7ECD9 100%)" }}>
 
         {/* 헤더: 타이틀 좌측 + 마스코트 우측 */}
-        <div className="px-6 flex items-center justify-between" style={{ paddingTop: 60, paddingBottom: 20 }}>
+        <div className="flex items-center justify-between" style={{ paddingTop: 60, paddingBottom: 20, paddingLeft: 28, paddingRight: 20 }}>
           <h1 style={{
             fontSize: 38, fontWeight: 900, color: "#1E2A22",
             letterSpacing: "-1px", lineHeight: 1.15,

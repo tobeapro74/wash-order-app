@@ -6,9 +6,6 @@ import { saveUser } from "@/lib/auth";
 import { Kaechi } from "@/components/Kaechi";
 import { Suspense } from "react";
 
-const REST_API_KEY  = "36794df87998cd398c837ba4c6c43b4d";
-const REDIRECT_URI  = "https://main.d1qohqt5mb5sln.amplifyapp.com/auth/kakao";
-
 function KakaoCallback() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -20,29 +17,18 @@ function KakaoCallback() {
 
     (async () => {
       try {
-        // 1. 인가코드 → access_token
-        const tokenRes = await fetch("https://kauth.kakao.com/oauth/token", {
+        // 서버 API Route를 통해 토큰 교환 (CORS 우회)
+        const res = await fetch("/api/kakao-token", {
           method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({
-            grant_type: "authorization_code",
-            client_id: REST_API_KEY,
-            redirect_uri: REDIRECT_URI,
-            code,
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code }),
         });
-        const tokenData = await tokenRes.json();
-        if (!tokenData.access_token) throw new Error("토큰 발급 실패");
+        if (!res.ok) throw new Error("토큰 교환 실패");
+        const data = await res.json();
 
-        // 2. access_token → 사용자 정보
-        const userRes = await fetch("https://kapi.kakao.com/v2/user/me", {
-          headers: { Authorization: `Bearer ${tokenData.access_token}` },
-        });
-        const userData = await userRes.json();
-
-        const kakaoId = String(userData.id);
-        const nickname = userData.kakao_account?.profile?.nickname ?? "";
-        const profileImage = userData.kakao_account?.profile?.profile_image_url;
+        const kakaoId: string = data.id;
+        const nickname: string = data.nickname ?? "";
+        const profileImage: string | undefined = data.profileImage || undefined;
 
         if (nickname) {
           saveUser({ kakaoId, nickname, profileImage });

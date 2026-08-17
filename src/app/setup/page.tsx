@@ -48,12 +48,14 @@ export default function SetupPage() {
         style={{ background: "linear-gradient(180deg,#EAF7EE 0%,#D8F0E0 45%,#C7ECD9 100%)" }}>
 
         {/* 헤더: 타이틀 좌측 + 마스코트 우측 */}
-        <div className="px-5 flex items-center justify-between" style={{ paddingTop: 60, paddingBottom: 8 }}>
-          <h1 className="font-bold leading-tight"
-            style={{ fontSize: 28, color: "#1E2A22", letterSpacing: "-0.3px", lineHeight: 1.2 }}>
+        <div className="px-5 flex items-center justify-between" style={{ paddingTop: 60, paddingBottom: 20 }}>
+          <h1 style={{
+            fontSize: 38, fontWeight: 900, color: "#1E2A22",
+            letterSpacing: "-1px", lineHeight: 1.15,
+          }}>
             나의 씻기<br/>루틴
           </h1>
-          <Kaechi mood="normal" size={100} animate={false} />
+          <Kaechi mood="wave" size={100} animate={false} />
         </div>
 
         {/* 순서 카드 리스트 */}
@@ -61,28 +63,28 @@ export default function SetupPage() {
           {myOrder.map((id, i) => {
             const el = WASH_ELEMENTS.find(e => e.id === id)!;
             return (
-              <div key={id} className="bounce-in flex items-center gap-4 rounded-2xl"
+              <div key={id} className="bounce-in flex items-center gap-4"
                 style={{
                   background: "#FFFFFF",
+                  borderRadius: 16,
                   padding: "16px 20px",
                   height: 88,
-                  boxShadow: "0 6px 16px rgba(31,110,66,0.12)",
+                  boxShadow: "0 4px 14px rgba(31,110,66,0.10), 0 1px 3px rgba(0,0,0,0.06)",
                   animationDelay: `${i * 0.07}s`,
                 }}>
-                {/* 숫자 뱃지 */}
-                <div className="flex-shrink-0 flex items-center justify-center rounded-full"
+                {/* 숫자 뱃지 — 원형 44×44 */}
+                <div className="flex-shrink-0 flex items-center justify-center"
                   style={{
-                    width: 44, height: 44,
-                    background: "linear-gradient(180deg,#4CBE7C 0%,#2E8C56 100%)",
-                    boxShadow: "0 3px 0 #1F6E42",
+                    width: 44, height: 44, borderRadius: "50%",
+                    background: "linear-gradient(180deg,#3FA96B 0%,#2E8C56 100%)",
                   }}>
-                  <span className="font-bold text-white" style={{ fontSize: 18 }}>{i + 1}</span>
+                  <span style={{ fontSize: 18, fontWeight: 800, color: "#FFFFFF" }}>{i + 1}</span>
                 </div>
                 {/* 캐릭터 */}
                 <Image src={WASH_CHAR[id]} alt={el.label}
                   width={56} height={56} style={{ objectFit: "contain", flexShrink: 0 }} />
                 {/* 라벨 */}
-                <span className="flex-1 font-semibold" style={{ fontSize: 17, color: "#1E2A22" }}>
+                <span className="flex-1" style={{ fontSize: 17, fontWeight: 600, color: "#1E2A22" }}>
                   {el.label}
                 </span>
                 {/* 드래그 핸들 */}
@@ -102,14 +104,25 @@ export default function SetupPage() {
             maxWidth: 448,
           }}>
           <button onClick={() => router.push("/today")}
-            className="w-full btn-primary py-4 font-bold text-white"
-            style={{ fontSize: 17, letterSpacing: "0.02em" }}>
+            className="w-full font-bold text-white"
+            style={{
+              height: 56,
+              borderRadius: 999,
+              background: "linear-gradient(180deg,#4CBE7C 0%,#2E8C56 100%)",
+              boxShadow: "0 8px 20px rgba(46,140,86,0.35)",
+              fontSize: 17,
+              letterSpacing: "0.02em",
+              border: "none",
+              cursor: "pointer",
+            }}>
             오늘의 씻기 순서 보기 🎰
           </button>
           <button
             onClick={() => { localStorage.removeItem("wash_my_order"); setMyOrder(null); }}
-            className="text-xs text-center py-1"
-            style={{ color: "#5C6B60", opacity: 0.5 }}>
+            style={{
+              background: "none", border: "none", cursor: "pointer",
+              fontSize: 13, color: "#5C6B60", textAlign: "center", padding: "4px 0",
+            }}>
             순서 초기화
           </button>
         </div>

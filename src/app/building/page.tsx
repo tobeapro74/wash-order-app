@@ -25,9 +25,8 @@ function widthForFloor(floor: number, topFloor: number): number {
   return Math.round(minW + ((topFloor - floor) / (topFloor - 1)) * (maxW - minW));
 }
 
-// 캐릭터 확대 모달
-function CharZoomModal({ id, onClose }: { id: ElementId; onClose: () => void }) {
-  const el = WASH_ELEMENTS.find(e => e.id === id)!;
+// 순서 전체 확대 모달
+function OrderZoomModal({ order, onClose }: { order: ElementId[]; onClose: () => void }) {
   return (
     <div
       onClick={onClose}
@@ -35,21 +34,37 @@ function CharZoomModal({ id, onClose }: { id: ElementId; onClose: () => void }) 
         position: "fixed", inset: 0, zIndex: 100,
         background: "rgba(0,0,0,0.45)",
         display: "flex", alignItems: "center", justifyContent: "center",
+        padding: "0 24px",
       }}>
       <div
         onClick={e => e.stopPropagation()}
         style={{
+          width: "100%", maxWidth: 360,
           background: "linear-gradient(180deg,#EAF7EE 0%,#D8F0E0 100%)",
           borderRadius: 28,
-          padding: "36px 48px 28px",
-          display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
+          padding: "32px 24px 24px",
+          display: "flex", flexDirection: "column", alignItems: "center", gap: 20,
           boxShadow: "0 16px 48px rgba(0,0,0,0.22)",
         }}>
-        <Image src={WASH_CHAR[id]} alt={el.label}
-          width={140} height={140} style={{ objectFit: "contain" }} />
-        <span style={{ fontSize: 22, fontWeight: 900, color: "#1E2A22" }}>{el.label}</span>
+        <p style={{ fontSize: 15, fontWeight: 800, color: "#1F6E42", margin: 0 }}>씻기 순서</p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
+          {order.map((id, i) => {
+            const el = WASH_ELEMENTS.find(e => e.id === id)!;
+            return (
+              <span key={id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                  <Image src={WASH_CHAR[id]} alt={el.label}
+                    width={72} height={72} style={{ objectFit: "contain" }} />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#1E2A22" }}>{el.label}</span>
+                </span>
+                {i < order.length - 1 &&
+                  <span style={{ color: "#3FA96B", fontSize: 18, fontWeight: 700 }}>→</span>}
+              </span>
+            );
+          })}
+        </div>
         <button onClick={onClose} style={{
-          marginTop: 4, fontSize: 13, color: "#5C6B60",
+          fontSize: 13, color: "#5C6B60",
           background: "none", border: "none", cursor: "pointer",
         }}>닫기</button>
       </div>
@@ -63,7 +78,7 @@ export default function BuildingPage() {
   const [myOrder,       setMyOrder]       = useState<ElementId[] | null>(null);
   const [ranking,       setRanking]       = useState<{ order: ElementId[]; score: number }[]>([]);
   const [selectedFloor, setSelectedFloor] = useState<number | null>(null);
-  const [zoomChar,      setZoomChar]      = useState<ElementId | null>(null);
+  const [zoomOrder,     setZoomOrder]     = useState<ElementId[] | null>(null);
   const myFloorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -255,7 +270,7 @@ export default function BuildingPage() {
                           return (
                             <span key={id} style={{ display: "flex", alignItems: "center", gap: 4 }}>
                               <button
-                                onClick={e => { e.stopPropagation(); setZoomChar(id); }}
+                                onClick={e => { e.stopPropagation(); setZoomOrder(item.order); }}
                                 style={{ background: "none", border: "none", padding: 0, cursor: "zoom-in" }}>
                                 <Image src={WASH_CHAR[id]} alt={el.label}
                                   width={30} height={30} style={{ objectFit: "contain", display: "block" }} />
@@ -308,7 +323,7 @@ export default function BuildingPage() {
       <BottomNav />
 
       {/* 캐릭터 확대 모달 */}
-      {zoomChar && <CharZoomModal id={zoomChar} onClose={() => setZoomChar(null)} />}
+      {zoomOrder && <OrderZoomModal order={zoomOrder} onClose={() => setZoomOrder(null)} />}
     </div>
   );
 }

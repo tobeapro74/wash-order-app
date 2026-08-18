@@ -39,28 +39,35 @@ export default function LotteryMachine({
   const [phase, setPhase] = useState<Phase>("idle");
   const [order, setOrder] = useState<WashStep[] | null>(null);
   const [activeStep, setActiveStep] = useState<WashStep>(DEFAULT_STEP);
+  const pendingOrder = useRef<WashStep[] | null>(null);
+  const onResultRef = useRef(onResult);
+  onResultRef.current = onResult;
 
   const handleSpin = useCallback(() => {
     if (phase === "playing") return;
 
     const result = drawRandomOrder();
     const firstDrawn = result[0];
+    pendingOrder.current = result;
     setOrder(result);
     setActiveStep(firstDrawn);
     setPhase("playing");
-    onResult?.(result);
 
     requestAnimationFrame(() => {
       const video = videoRef.current;
       if (!video) return;
       video.load();
       video.currentTime = 0;
-      video.play().catch(() => setPhase("result"));
+      video.play().catch(() => {
+        setPhase("result");
+        onResultRef.current?.(result);
+      });
     });
-  }, [phase, onResult]);
+  }, [phase]);
 
   const handleVideoEnded = useCallback(() => {
     setPhase("result");
+    onResultRef.current?.(pendingOrder.current ?? []);
   }, []);
 
   const handleReset = useCallback(() => {

@@ -146,12 +146,11 @@ export default function BuildingPage() {
               width: 220, height: 90,
               background: "linear-gradient(180deg, #FCE18A 0%, #F5C84B 60%, #D89B1F 100%)",
               borderRadius: 20,
-              display: "flex", alignItems: "flex-end", justifyContent: "center",
-              paddingBottom: 14,
+              display: "flex", alignItems: "center", justifyContent: "center",
               boxShadow: "0 0 0 1px rgba(255,255,255,0.4) inset, 0 6px 20px rgba(216,155,31,0.4)",
               position: "relative", zIndex: 1,
             }}>
-              <span style={{ fontSize: 15, fontWeight: 800, color: "white",
+              <span style={{ fontSize: 20, fontWeight: 900, color: "white",
                 textShadow: "0 1px 4px rgba(0,0,0,0.25)" }}>
                 스카이라운지
               </span>

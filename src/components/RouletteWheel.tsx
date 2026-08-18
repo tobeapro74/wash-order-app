@@ -44,8 +44,10 @@ export function RouletteWheel({ myOrder, onResult }: RouletteWheelProps) {
       : Math.floor(Math.random() * 4);
 
     const targetAngle = targetIdx * SECTION_DEG + SECTION_DEG / 2;
+    // 현재 회전값을 0~359로 정규화해서 기준점 초기화 — 누적 오차 방지
+    const currentNorm = rotation % 360;
     const spins       = 5 + Math.floor(Math.random() * 3);
-    const newRotation = rotation + 360 * spins + (360 - targetAngle);
+    const newRotation = currentNorm + 360 * spins + (360 - targetAngle);
     finalRotRef.current = newRotation;
     setRotation(newRotation);
 

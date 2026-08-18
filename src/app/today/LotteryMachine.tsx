@@ -177,15 +177,13 @@ export default function LotteryMachine({
         </div>
 
         {!isDone && (
-          <div style={{
-            display: "flex", alignItems: "center",
-            gap: 4, flexWrap: "nowrap", minHeight: 36, overflow: "hidden",
-          }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {displayPicked.length === 0 && !isPlaying && (
-              <p style={{ fontSize: 13, color: "#5C6B60", margin: 0, width: "100%", textAlign: "center", whiteSpace: "nowrap" }}>
+              <p style={{ fontSize: 13, color: "#5C6B60", margin: 0, textAlign: "center", whiteSpace: "nowrap" }}>
                 ⭐ GO 버튼을 눌러 공을 뽑아보세요!
               </p>
             )}
+          <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "nowrap", overflow: "hidden" }}>
             {displayPicked.map((id, i) => (
               <span key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <span style={{
@@ -214,6 +212,7 @@ export default function LotteryMachine({
                 </span>
               </span>
             ))}
+          </div>
           </div>
         )}
 

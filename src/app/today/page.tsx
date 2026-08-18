@@ -7,7 +7,7 @@ import {
   hasVotedToday, WASH_ELEMENTS, DISLIKE_REASONS, randomCopy, orderKey,
 } from "@/lib/wash";
 import { apiVote } from "@/lib/api";
-import { RouletteWheel } from "@/components/RouletteWheel";
+import LotteryMachine from "./LotteryMachine";
 import { Kaechi, WASH_CHAR } from "@/components/Kaechi";
 import { BottomNav } from "@/components/BottomNav";
 import { useAuth } from "@/hooks/useAuth";
@@ -183,8 +183,8 @@ export default function TodayPage() {
           {/* 여백 */}
           <div style={{ height: 20 }} />
 
-          {/* 룰렛 카드 */}
-          <RouletteWheel myOrder={myOrder} onResult={handleResult} />
+          {/* 로또볼 머신 */}
+          <LotteryMachine onResult={handleResult} />
         </div>
       )}
 

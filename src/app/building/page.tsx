@@ -90,7 +90,7 @@ export default function BuildingPage() {
         if (serverRankings.length > 0)
           setRanking(serverRankings.map(r => ({ order: r.order as ElementId[], score: r.score, likes: r.likes ?? 0, dislikes: r.dislikes ?? 0 })));
       })
-      .catch(() => setRanking(getRanking(loadScores())));
+      .catch(() => setRanking(getRanking(loadScores()).map(r => ({ ...r, likes: 0, dislikes: 0 }))));
   }, [router]);
 
   useEffect(() => {

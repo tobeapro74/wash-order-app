@@ -76,7 +76,7 @@ export default function BuildingPage() {
   const router = useRouter();
   useAuth();  // 비로그인 시 /login 리다이렉트
   const [myOrder,       setMyOrder]       = useState<ElementId[] | null>(null);
-  const [ranking,       setRanking]       = useState<{ order: ElementId[]; score: number }[]>([]);
+  const [ranking,       setRanking]       = useState<{ order: ElementId[]; score: number; likes: number; dislikes: number }[]>([]);
   const [selectedFloor, setSelectedFloor] = useState<number | null>(null);
   const [zoomOrder,     setZoomOrder]     = useState<ElementId[] | null>(null);
   const myFloorRef = useRef<HTMLDivElement>(null);
@@ -88,7 +88,7 @@ export default function BuildingPage() {
     apiGetRankings()
       .then(serverRankings => {
         if (serverRankings.length > 0)
-          setRanking(serverRankings.map(r => ({ order: r.order as ElementId[], score: r.score })));
+          setRanking(serverRankings.map(r => ({ order: r.order as ElementId[], score: r.score, likes: r.likes ?? 0, dislikes: r.dislikes ?? 0 })));
       })
       .catch(() => setRanking(getRanking(loadScores())));
   }, [router]);
@@ -242,22 +242,31 @@ export default function BuildingPage() {
                           )}
                         </div>
 
-                        {/* 점수 pill (우측, 내 층 제외) */}
-                        {!isMine && (
+                        {/* 좋아요/싫어요 pill (우측, 모든 층) */}
+                        <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
                           <div style={{
                             background: "rgba(255,255,255,0.88)",
-                            borderRadius: 999,
-                            padding: "4px 10px",
-                            display: "flex", alignItems: "center", gap: 4,
+                            borderRadius: 999, padding: "4px 9px",
+                            display: "flex", alignItems: "center", gap: 3,
                             boxShadow: "0 1px 6px rgba(0,0,0,0.10)",
-                            flexShrink: 0,
                           }}>
-                            <span style={{ fontSize: 13 }}>👍</span>
-                            <span style={{ fontSize: 14, fontWeight: 800, color: "#1F6E42" }}>
-                              {item.score}
+                            <span style={{ fontSize: 12 }}>👍</span>
+                            <span style={{ fontSize: 13, fontWeight: 800, color: "#1F6E42" }}>
+                              {item.likes}
                             </span>
                           </div>
-                        )}
+                          <div style={{
+                            background: "rgba(255,255,255,0.88)",
+                            borderRadius: 999, padding: "4px 9px",
+                            display: "flex", alignItems: "center", gap: 3,
+                            boxShadow: "0 1px 6px rgba(0,0,0,0.10)",
+                          }}>
+                            <span style={{ fontSize: 12 }}>👎</span>
+                            <span style={{ fontSize: 13, fontWeight: 800, color: "#D9564A" }}>
+                              {item.dislikes}
+                            </span>
+                          </div>
+                        </div>
                       </>
                     )}
 

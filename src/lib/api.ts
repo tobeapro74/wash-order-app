@@ -49,7 +49,7 @@ export async function apiVote(orderKey: string, liked: boolean): Promise<{ ok?: 
 }
 
 // 랭킹 조회
-export async function apiGetRankings(): Promise<{ order: string[]; orderKey: string; score: number }[]> {
+export async function apiGetRankings(): Promise<{ order: string[]; orderKey: string; score: number; likes: number; dislikes: number }[]> {
   const res = await fetch(`${BASE}/rankings`);
   const data = await res.json();
   return data.rankings ?? [];

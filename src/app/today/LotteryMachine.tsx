@@ -129,32 +129,8 @@ export default function LotteryMachine({
           playsInline
           preload="auto"
           aria-hidden="true"
-          style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
         />
-
-        {!isPlaying && !isDone && (
-          <button
-            onClick={handleSpin}
-            style={{
-              position: "absolute", inset: 0, width: "100%", height: "100%",
-              background: "linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,0.30) 100%)",
-              border: "none", cursor: "pointer",
-              display: "flex", alignItems: "flex-end", justifyContent: "center",
-              paddingBottom: 24,
-            }}
-          >
-            <span style={{
-              background: "linear-gradient(180deg,#4CBE7C 0%,#2E8C56 100%)",
-              color: "#fff", fontSize: 20, fontWeight: 800,
-              padding: "14px 40px", borderRadius: 999,
-              boxShadow: "0 8px 20px rgba(46,140,86,0.4)",
-              letterSpacing: "0.02em",
-              pointerEvents: "none",
-            }}>
-              {currentStep === 0 ? "GO! 돌리기" : `GO! ${roundLabel} 뽑기`}
-            </span>
-          </button>
-        )}
 
         {isPlaying && (
           <div style={{
@@ -166,6 +142,26 @@ export default function LotteryMachine({
           </div>
         )}
       </div>
+
+      {/* GO 버튼 — 영상 바깥 아래에 배치 */}
+      {!isPlaying && !isDone && (
+        <div style={{ padding: "16px 20px 0", display: "flex", justifyContent: "center" }}>
+          <button
+            onClick={handleSpin}
+            style={{
+              width: "100%",
+              background: "linear-gradient(180deg,#4CBE7C 0%,#2E8C56 100%)",
+              border: "none", cursor: "pointer", borderRadius: 999,
+              padding: "16px 0",
+              color: "#fff", fontSize: 20, fontWeight: 800,
+              boxShadow: "0 8px 20px rgba(46,140,86,0.4)",
+              letterSpacing: "0.02em",
+            }}
+          >
+            {currentStep === 0 ? "GO! 돌리기" : `GO! ${roundLabel} 뽑기`}
+          </button>
+        </div>
+      )}
 
       {/* ── 하단 진행 & 결과 ── */}
       <div style={{ padding: "14px 20px 20px" }}>

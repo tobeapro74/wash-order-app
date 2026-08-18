@@ -157,7 +157,7 @@ export default function TodayPage() {
       {/* ══════════════ SPIN 화면 ══════════════ */}
       {phase === "spin" && (
         <div className="flex flex-col items-center px-5"
-          style={{ paddingTop: 4, paddingBottom: "calc(env(safe-area-inset-bottom) + 90px)" }}>
+          style={{ paddingTop: 36, paddingBottom: "calc(env(safe-area-inset-bottom) + 90px)" }}>
 
           <div style={{ marginBottom: 2 }}>
             <Kaechi mood="normal" size={72} />

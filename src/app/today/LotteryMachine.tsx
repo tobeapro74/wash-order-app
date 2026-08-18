@@ -120,7 +120,7 @@ export default function LotteryMachine({
     }}>
 
       {/* ── 영상 ── */}
-      <div style={{ position: "relative", width: "100%", aspectRatio: "4/3", background: "#c8e8d4" }}>
+      <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", background: "#c8e8d4" }}>
         <video
           ref={videoRef}
           src="/lottery-machine.mp4"
@@ -152,7 +152,7 @@ export default function LotteryMachine({
               width: "100%",
               background: "linear-gradient(180deg,#4CBE7C 0%,#2E8C56 100%)",
               border: "none", cursor: "pointer", borderRadius: 999,
-              padding: "16px 0",
+              padding: "11px 0",
               color: "#fff", fontSize: 20, fontWeight: 800,
               boxShadow: "0 8px 20px rgba(46,140,86,0.4)",
               letterSpacing: "0.02em",

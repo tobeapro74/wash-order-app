@@ -183,7 +183,7 @@ export default function LotteryMachine({
                 ⭐ GO 버튼을 눌러 공을 뽑아보세요!
               </p>
             )}
-          <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "nowrap", overflow: "hidden" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, flexWrap: "nowrap", overflow: "hidden" }}>
             {displayPicked.map((id, i) => (
               <span key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <span style={{

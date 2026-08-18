@@ -134,11 +134,32 @@ export default function LotteryMachine({
 
         {isPlaying && (
           <div style={{
-            position: "absolute", top: 14, left: 0, right: 0,
-            textAlign: "center", color: "#fff", fontSize: 14, fontWeight: 600,
-            textShadow: "0 2px 4px rgba(0,0,0,0.5)",
+            position: "absolute", inset: 0,
+            display: "flex", flexDirection: "column",
+            alignItems: "center", justifyContent: "flex-end",
+            paddingBottom: 24,
+            background: "linear-gradient(to top, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 50%)",
           }}>
-            🎱 {roundLabel} 공을 뽑는 중...
+            <div style={{
+              background: "rgba(255,255,255,0.18)",
+              backdropFilter: "blur(6px)",
+              borderRadius: 999,
+              padding: "10px 28px",
+              textAlign: "center",
+            }}>
+              <p style={{ color: "#fff", fontSize: 13, fontWeight: 600, margin: 0, opacity: 0.85 }}>
+                🎱 {roundLabel} 공을 뽑는 중...
+              </p>
+              {fullOrder.current[currentStep] && (
+                <p style={{
+                  color: "#fff", fontSize: 36, fontWeight: 900, margin: "4px 0 0",
+                  textShadow: "0 2px 12px rgba(0,0,0,0.4)",
+                  letterSpacing: "-1px",
+                }}>
+                  {LABEL[fullOrder.current[currentStep]]}
+                </p>
+              )}
+            </div>
           </div>
         )}
       </div>

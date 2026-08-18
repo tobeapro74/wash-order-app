@@ -14,7 +14,7 @@ const SLIDES = [
     mood: "normal" as const,
     eyebrow: "룰렛으로 결정해요",
     title: "오늘의 씻기 순서를\n랜덤으로 뽑아요",
-    desc: "머리? 몸? 얼굴? 양치?\n룰렛을 돌려 오늘의 순서를 정해봐요.",
+    desc: "머리? 샤워? 세수? 양치?\n룰렛을 돌려 오늘의 순서를 정해봐요.",
   },
   {
     mood: "mini" as const,

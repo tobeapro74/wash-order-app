@@ -1,9 +1,9 @@
 // 씻기 4요소
 export const WASH_ELEMENTS = [
   { id: "teeth", label: "양치", emoji: "🦷" },
-  { id: "face",  label: "얼굴", emoji: "🙂" },
+  { id: "face",  label: "세수", emoji: "🙂" },
   { id: "hair",  label: "머리", emoji: "💆" },
-  { id: "body",  label: "몸",   emoji: "🚿" },
+  { id: "body",  label: "샤워", emoji: "🚿" },
 ] as const;
 
 export type ElementId = typeof WASH_ELEMENTS[number]["id"];
@@ -126,7 +126,7 @@ export function randomCopy(): string {
 export const DISLIKE_REASONS = [
   "양치가 늦어서 입이 허전해요",
   "머리가 먼저라 물이 차가워요",
-  "몸이 먼저라 기분이 이상해요",
+  "샤워가 먼저라 기분이 이상해요",
   "순서가 그냥 마음에 안 들어요",
   "그냥 싫어요",
 ];

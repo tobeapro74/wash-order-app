@@ -5,9 +5,9 @@ import { ElementId } from "@/lib/wash";
 
 const LABEL: Record<ElementId, string> = {
   teeth: "양치",
-  face:  "얼굴",
+  face:  "세수",
   hair:  "머리",
-  body:  "몸",
+  body:  "샤워",
 };
 
 const ALL_IDS: ElementId[] = ["teeth", "face", "hair", "body"];

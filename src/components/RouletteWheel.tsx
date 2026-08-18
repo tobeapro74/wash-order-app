@@ -11,7 +11,7 @@ interface RouletteWheelProps {
 const SEGMENTS = [
   { id: "teeth" as ElementId, label: "양치",    img: "/char-teeth.png", bg: "#DCD6F5" }, // lavender
   { id: "face"  as ElementId, label: "세수",    img: "/char-face.png",  bg: "#F7CFE0" }, // pink
-  { id: "body"  as ElementId, label: "몸",      img: "/char-body.png",  bg: "#FBEFC9" }, // cream
+  { id: "body"  as ElementId, label: "샤워",    img: "/char-body.png",  bg: "#FBEFC9" }, // cream
   { id: "hair"  as ElementId, label: "머리감기", img: "/char-hair.png",  bg: "#C7ECD9" }, // mint
 ];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { ElementId } from "@/lib/wash";
 
 const LABEL: Record<ElementId, string> = {
@@ -28,66 +28,78 @@ export default function LotteryMachine({
 }: {
   onResult?: (order: ElementId[], isJoker: boolean) => void;
 }) {
-  const videoRef    = useRef<HTMLVideoElement>(null);
-  const fullOrder   = useRef<ElementId[]>([]);   // 미리 결정된 4개 순서
-  const step        = useRef(0);                  // 현재 단계 0~4
-  const onResultRef = useRef(onResult);
+  const videoRef     = useRef<HTMLVideoElement>(null);
+  const fullOrder    = useRef<ElementId[]>([]);
+  const stepRef      = useRef(0);
+  const onResultRef  = useRef(onResult);
   onResultRef.current = onResult;
 
   const [picked, setPicked] = useState<ElementId[]>([]);
   const [phase,  setPhase]  = useState<Phase>("idle");
 
-  // ── 영상 재생 ──
-  const playVideo = () => {
+  // video ended 핸들러를 useEffect로 DOM에 직접 등록 — React 합성이벤트 stale 문제 회피
+  useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    video.currentTime = 0;
-    video.play().catch(() => revealCurrent());
-  };
 
-  // ── 현재 단계 결과 공개 ──
-  const revealCurrent = () => {
-    const currentStep = step.current;
-    const id = fullOrder.current[currentStep];
-    const nextStep = currentStep + 1;
-    step.current = nextStep;
+    const onEnded = () => {
+      const s  = stepRef.current;           // 현재 단계 (0~3)
+      const id = fullOrder.current[s];      // 이번에 뽑힌 항목
+      const next = s + 1;
+      stepRef.current = next;
 
-    if (nextStep >= 4) {
-      // 마지막 공 공개 → 잠깐 보여준 뒤 result로
-      setPicked(fullOrder.current.slice());
-      setTimeout(() => {
-        setPhase("result");
-        // 결과를 page.tsx로 전달 (투표 플로우 진입)
-        onResultRef.current?.(fullOrder.current.slice(), false);
-      }, 1200); // 1.2초 동안 4개 공 표시
-    } else {
-      setPicked(prev => [...prev, id]);
-      setPhase("idle");
-    }
-  };
+      if (next >= 4) {
+        // 마지막 공 — 4개 모두 표시 후 1.2초 뒤 result
+        setPicked(fullOrder.current.slice());
+        setTimeout(() => {
+          setPhase("result");
+          onResultRef.current?.(fullOrder.current.slice(), false);
+        }, 1200);
+      } else {
+        setPicked(prev => [...prev, id]);
+        setPhase("idle");
+      }
+    };
 
-  // ── GO 버튼 클릭 ──
+    video.addEventListener("ended", onEnded);
+    return () => video.removeEventListener("ended", onEnded);
+  }, []); // 마운트 시 한 번만 — ref로 항상 최신값 접근
+
   const handleSpin = () => {
     if (phase === "playing") return;
 
-    // 첫 번째 뽑기: 순서 결정
-    if (step.current === 0) {
-      fullOrder.current = makeShuffledOrder();
+    if (stepRef.current === 0) {
+      const order = makeShuffledOrder();
+      fullOrder.current = order;
       setPicked([]);
     }
 
     setPhase("playing");
-    playVideo();
+
+    const video = videoRef.current;
+    if (!video) return;
+    video.currentTime = 0;
+    video.play().catch(() => {
+      // 자동재생 실패 시 해당 단계 강제 공개
+      const s  = stepRef.current;
+      const id = fullOrder.current[s];
+      const next = s + 1;
+      stepRef.current = next;
+      if (next >= 4) {
+        setPicked(fullOrder.current.slice());
+        setTimeout(() => {
+          setPhase("result");
+          onResultRef.current?.(fullOrder.current.slice(), false);
+        }, 1200);
+      } else {
+        setPicked(prev => [...prev, id]);
+        setPhase("idle");
+      }
+    });
   };
 
-  // ── 영상 종료 ──
-  const handleVideoEnded = () => {
-    revealCurrent();
-  };
-
-  // ── 다시 뽑기 ──
   const handleReset = () => {
-    step.current = 0;
+    stepRef.current = 0;
     fullOrder.current = [];
     setPicked([]);
     setPhase("idle");
@@ -95,13 +107,11 @@ export default function LotteryMachine({
     if (video) video.currentTime = 0;
   };
 
-  const currentStep  = step.current;
+  const currentStep  = stepRef.current;
   const isDone       = phase === "result";
   const isPlaying    = phase === "playing";
   const ROUND_LABELS = ["첫 번째", "두 번째", "세 번째", "마지막"];
   const roundLabel   = ROUND_LABELS[Math.min(currentStep, 3)];
-
-  // 진행 중 표시할 picked (마지막 공 reveal 직후에는 4개 모두 표시)
   const displayPicked = isDone ? fullOrder.current : picked;
 
   return (
@@ -123,11 +133,10 @@ export default function LotteryMachine({
           playsInline
           preload="auto"
           aria-hidden="true"
-          onEnded={handleVideoEnded}
           style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
         />
 
-        {/* idle: GO 버튼 오버레이 */}
+        {/* idle: GO 버튼 */}
         {!isPlaying && !isDone && (
           <button
             onClick={handleSpin}
@@ -136,7 +145,7 @@ export default function LotteryMachine({
               background: "linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,0.30) 100%)",
               border: "none", cursor: "pointer",
               display: "flex", alignItems: "flex-end", justifyContent: "center",
-              paddingBottom: 28,
+              paddingBottom: 24,
             }}
           >
             <span style={{
@@ -164,11 +173,11 @@ export default function LotteryMachine({
         )}
       </div>
 
-      {/* ── 하단 진행 & 결과 영역 ── */}
-      <div style={{ padding: "20px 20px 36px" }}>
+      {/* ── 하단 진행 & 결과 ── */}
+      <div style={{ padding: "16px 20px 28px" }}>
 
         {/* 진행 바 */}
-        <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
+        <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
           {[0,1,2,3].map(i => (
             <div key={i} style={{
               flex: 1, height: 5, borderRadius: 999,
@@ -182,14 +191,13 @@ export default function LotteryMachine({
         {!isDone && (
           <div style={{
             display: "flex", alignItems: "center",
-            gap: 6, flexWrap: "wrap", minHeight: 40,
+            gap: 6, flexWrap: "wrap", minHeight: 36,
           }}>
             {displayPicked.length === 0 && !isPlaying && (
               <p style={{ fontSize: 14, color: "#5C6B60", margin: 0, width: "100%", textAlign: "center" }}>
                 ⭐ GO 버튼을 눌러 공을 뽑아보세요!
               </p>
             )}
-
             {displayPicked.map((id, i) => (
               <span key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <span style={{
@@ -204,11 +212,9 @@ export default function LotteryMachine({
                 )}
               </span>
             ))}
-
-            {/* 남은 슬롯 점선 */}
             {Array.from({ length: 4 - displayPicked.length }).map((_, i) => (
-              <span key={`empty-${i}`} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                {displayPicked.length + i > 0 && (
+              <span key={`e-${i}`} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                {(displayPicked.length + i > 0) && (
                   <span style={{ color: "#9FE0B8", fontWeight: 700 }}>→</span>
                 )}
                 <span style={{
@@ -228,7 +234,7 @@ export default function LotteryMachine({
           <div style={{ animation: "lmFadeInUp 0.4s ease" }}>
             <p style={{
               textAlign: "center", fontSize: 14, fontWeight: 500,
-              color: "#5C6B60", marginBottom: 16,
+              color: "#5C6B60", marginBottom: 14,
             }}>
               🐣 씻기 요정이 정했어요.
             </p>
@@ -250,7 +256,7 @@ export default function LotteryMachine({
               ))}
             </div>
             <button onClick={handleReset} style={{
-              display: "block", margin: "18px auto 0",
+              display: "block", margin: "16px auto 0",
               background: "none", border: "none",
               color: "#5C6B60", fontSize: 13,
               textDecoration: "underline", cursor: "pointer",

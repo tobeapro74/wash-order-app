@@ -188,10 +188,10 @@ export default function LotteryMachine({
               <span key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <span style={{
                   background: "#D8F0E0", color: "#1F6E42",
-                  fontWeight: 800, fontSize: 13,
-                  padding: "5px 10px", borderRadius: 999, whiteSpace: "nowrap",
+                  fontWeight: 800, fontSize: 16,
+                  padding: "5px 12px", borderRadius: 999, whiteSpace: "nowrap",
                 }}>
-                  {i + 1}. {LABEL[id]}
+                  {LABEL[id]}
                 </span>
                 {i < displayPicked.length - 1 && (
                   <span style={{ color: "#3FA96B", fontWeight: 700 }}>→</span>

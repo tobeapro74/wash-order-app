@@ -66,9 +66,16 @@ export function vote(order: ElementId[], liked: boolean) {
   saveScores(scores);
 }
 
-// 오늘의 랜덤 순서 (날짜가 바뀌면 재생성)
+// KST 기준 오늘 날짜 (YYYY-MM-DD)
+function todayKST(): string {
+  const now = new Date();
+  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  return kst.toISOString().slice(0, 10);
+}
+
+// 오늘의 랜덤 순서 (날짜가 바뀌면 재생성, KST 기준)
 export function getTodayOrder(): ElementId[] {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayKST();
   const saved = localStorage.getItem(LS_TODAY);
   if (saved) {
     const parsed = JSON.parse(saved);
@@ -82,16 +89,16 @@ export function getTodayOrder(): ElementId[] {
   return picked;
 }
 
-// 오늘 이미 투표했는지
+// 오늘 이미 투표했는지 (KST 기준)
 export function hasVotedToday(): boolean {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayKST();
   const v = localStorage.getItem(LS_VOTED);
   if (!v) return false;
   return JSON.parse(v).date === today;
 }
 
 export function markVotedToday() {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayKST();
   localStorage.setItem(LS_VOTED, JSON.stringify({ date: today }));
 }
 

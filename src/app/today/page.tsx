@@ -43,12 +43,12 @@ function DottedArrow() {
   );
 }
 
-// 2×2 그리드 위치 — 각 캐릭터의 중심점 (%)
+// 2×2 그리드 위치 — 시계방향: 좌상→우상→우하→좌하
 const GRID_POS = [
-  { top: "18%",  left: "18%"  },   // 좌상 (1번 START)
-  { top: "18%",  right: "18%" },   // 우상
-  { top: "68%",  left: "18%"  },   // 좌하
-  { top: "68%",  right: "18%" },   // 우하
+  { top: "18%",  left: "18%"  },   // 1번 START (좌상)
+  { top: "18%",  right: "18%" },   // 2번 (우상)
+  { top: "68%",  right: "18%" },   // 3번 (우하)
+  { top: "68%",  left: "18%"  },   // 4번 (좌하)
 ];
 
 // 씻기 순서 2×2 그리드 (result/voted 공용)
@@ -66,7 +66,7 @@ function OrderGrid({ order, showConfetti, isJoker, mood }: {
         const pos = GRID_POS[i];
         const isRight = "right" in pos;
         return (
-          <div key={id}
+          <div key={i}
             className="absolute flex flex-col items-center"
             style={{ ...pos, transform: isRight ? "translateX(50%)" : "translateX(-50%)", gap: 4 }}>
             {/* 1번 시작점 뱃지 */}

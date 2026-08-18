@@ -6,8 +6,16 @@ import {
   ElementId, loadMyOrder, getTodayOrder, vote, markVotedToday,
   hasVotedToday, WASH_ELEMENTS, DISLIKE_REASONS, randomCopy, orderKey,
 } from "@/lib/wash";
+import { WashStep } from "@/lib/washOrder";
 import { apiVote } from "@/lib/api";
 import LotteryMachine from "./LotteryMachine";
+
+const WASH_STEP_TO_ELEMENT: Record<WashStep, ElementId> = {
+  세수: "face",
+  머리: "hair",
+  샤워: "body",
+  양치: "teeth",
+};
 import { Kaechi, WASH_CHAR } from "@/components/Kaechi";
 import { BottomNav } from "@/components/BottomNav";
 import { useAuth } from "@/hooks/useAuth";
@@ -127,11 +135,11 @@ export default function TodayPage() {
     setCopy(randomCopy());
   }, [router]);
 
-  const handleResult = (order: ElementId[], joker: boolean) => {
-    setResultOrder(order);
-    setIsJoker(joker);
+  const handleResult = (order: WashStep[]) => {
+    const elementOrder = order.map(s => WASH_STEP_TO_ELEMENT[s]);
+    setResultOrder(elementOrder);
+    setIsJoker(false);
     setPhase("result");
-    if (joker) setShowConfetti(true);
   };
 
   const handleLike = () => {

@@ -157,33 +157,23 @@ export default function TodayPage() {
 
       {/* ══════════════ SPIN 화면 ══════════════ */}
       {phase === "spin" && (
-        <div className="flex-1 flex flex-col items-center px-5 pb-28"
-          style={{ paddingTop: 56 }}>
+        <div className="flex-1 flex flex-col items-center px-5"
+          style={{ paddingTop: 4, paddingBottom: "calc(env(safe-area-inset-bottom) + 110px)" }}>
 
-          {/* 마스코트 — 이미지 목표: 보라 로브+지팡이, 현재 에셋 기준 크게 */}
-          <div style={{ marginBottom: 8 }}>
-            <Kaechi mood="normal" size={120} />
+          <div style={{ marginBottom: 4 }}>
+            <Kaechi mood="normal" size={80} />
           </div>
 
-          {/* 타이틀 — 이미지처럼 초대형 Extra Bold */}
           <h1 className="text-center"
-            style={{
-              fontSize: 38,
-              fontWeight: 900,
-              color: "#1E2A22",
-              letterSpacing: "-1px",
-              lineHeight: 1.1,
-            }}>
+            style={{ fontSize: 26, fontWeight: 900, color: "#1E2A22", letterSpacing: "-1px", lineHeight: 1.1 }}>
             오늘의 씻기 순서
           </h1>
-          <p className="text-center mt-2" style={{ fontSize: 16, color: "#5C6B60", fontWeight: 400 }}>
+          <p className="text-center mt-1" style={{ fontSize: 13, color: "#5C6B60", fontWeight: 400 }}>
             오늘은 어디부터 씻을까요?
           </p>
 
-          {/* 여백 */}
-          <div style={{ height: 20 }} />
+          <div style={{ height: 8 }} />
 
-          {/* 로또볼 머신 */}
           <LotteryMachine onResult={handleResult} />
         </div>
       )}

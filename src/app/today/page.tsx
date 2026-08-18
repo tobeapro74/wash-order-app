@@ -152,27 +152,24 @@ export default function TodayPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-dvh"
-      style={{ background: "linear-gradient(180deg,#EAF7EE 0%,#D8F0E0 45%,#C7ECD9 100%)" }}>
+    <div style={{ background: "linear-gradient(180deg,#EAF7EE 0%,#D8F0E0 45%,#C7ECD9 100%)", minHeight: "100dvh" }}>
 
       {/* ══════════════ SPIN 화면 ══════════════ */}
       {phase === "spin" && (
-        <div className="flex-1 flex flex-col items-center px-5"
-          style={{ paddingTop: 4, paddingBottom: "calc(env(safe-area-inset-bottom) + 110px)" }}>
+        <div className="flex flex-col items-center px-5"
+          style={{ paddingTop: 4, paddingBottom: "calc(env(safe-area-inset-bottom) + 90px)" }}>
 
-          <div style={{ marginBottom: 4 }}>
-            <Kaechi mood="normal" size={80} />
+          <div style={{ marginBottom: 2 }}>
+            <Kaechi mood="normal" size={72} />
           </div>
 
           <h1 className="text-center"
             style={{ fontSize: 26, fontWeight: 900, color: "#1E2A22", letterSpacing: "-1px", lineHeight: 1.1 }}>
             오늘의 씻기 순서
           </h1>
-          <p className="text-center mt-1" style={{ fontSize: 13, color: "#5C6B60", fontWeight: 400 }}>
+          <p className="text-center mt-1" style={{ fontSize: 13, color: "#5C6B60", fontWeight: 400, marginBottom: 8 }}>
             오늘은 어디부터 씻을까요?
           </p>
-
-          <div style={{ height: 8 }} />
 
           <LotteryMachine onResult={handleResult} />
         </div>
@@ -181,7 +178,7 @@ export default function TodayPage() {
       {/* ══════════════ RESULT 화면 ══════════════ */}
       {phase === "result" && resultOrder && (
         <div style={{
-          flex: 1, display: "flex", flexDirection: "column",
+          minHeight: "100dvh", display: "flex", flexDirection: "column",
           alignItems: "center", padding: "0 20px 120px",
         }}>
 
@@ -348,8 +345,8 @@ export default function TodayPage() {
 
       {/* ══════════════ VOTED 화면 ══════════════ */}
       {phase === "voted" && resultOrder && (
-        <div className="flex-1 flex flex-col items-center px-5 pb-28"
-          style={{ paddingTop: 24 }}>
+        <div className="flex flex-col items-center px-5 pb-28"
+          style={{ paddingTop: 24, minHeight: "100dvh" }}>
 
           {/* 타이틀 — 대형, 중앙정렬 */}
           <h1 className="text-center bounce-in"

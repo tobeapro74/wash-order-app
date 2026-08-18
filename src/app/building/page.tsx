@@ -25,12 +25,45 @@ function widthForFloor(floor: number, topFloor: number): number {
   return Math.round(minW + ((topFloor - floor) / (topFloor - 1)) * (maxW - minW));
 }
 
+// 캐릭터 확대 모달
+function CharZoomModal({ id, onClose }: { id: ElementId; onClose: () => void }) {
+  const el = WASH_ELEMENTS.find(e => e.id === id)!;
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 100,
+        background: "rgba(0,0,0,0.45)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: "linear-gradient(180deg,#EAF7EE 0%,#D8F0E0 100%)",
+          borderRadius: 28,
+          padding: "36px 48px 28px",
+          display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
+          boxShadow: "0 16px 48px rgba(0,0,0,0.22)",
+        }}>
+        <Image src={WASH_CHAR[id]} alt={el.label}
+          width={140} height={140} style={{ objectFit: "contain" }} />
+        <span style={{ fontSize: 22, fontWeight: 900, color: "#1E2A22" }}>{el.label}</span>
+        <button onClick={onClose} style={{
+          marginTop: 4, fontSize: 13, color: "#5C6B60",
+          background: "none", border: "none", cursor: "pointer",
+        }}>닫기</button>
+      </div>
+    </div>
+  );
+}
+
 export default function BuildingPage() {
   const router = useRouter();
   useAuth();  // 비로그인 시 /login 리다이렉트
   const [myOrder,       setMyOrder]       = useState<ElementId[] | null>(null);
   const [ranking,       setRanking]       = useState<{ order: ElementId[]; score: number }[]>([]);
   const [selectedFloor, setSelectedFloor] = useState<number | null>(null);
+  const [zoomChar,      setZoomChar]      = useState<ElementId | null>(null);
   const myFloorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -221,8 +254,12 @@ export default function BuildingPage() {
                           const el = WASH_ELEMENTS.find(e => e.id === id)!;
                           return (
                             <span key={id} style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                              <Image src={WASH_CHAR[id]} alt={el.label}
-                                width={30} height={30} style={{ objectFit: "contain" }} />
+                              <button
+                                onClick={e => { e.stopPropagation(); setZoomChar(id); }}
+                                style={{ background: "none", border: "none", padding: 0, cursor: "zoom-in" }}>
+                                <Image src={WASH_CHAR[id]} alt={el.label}
+                                  width={30} height={30} style={{ objectFit: "contain", display: "block" }} />
+                              </button>
                               {j < item.order.length - 1 &&
                                 <span style={{ color: "#3FA96B", fontSize: 11 }}>→</span>}
                             </span>
@@ -269,6 +306,9 @@ export default function BuildingPage() {
       </div>
 
       <BottomNav />
+
+      {/* 캐릭터 확대 모달 */}
+      {zoomChar && <CharZoomModal id={zoomChar} onClose={() => setZoomChar(null)} />}
     </div>
   );
 }

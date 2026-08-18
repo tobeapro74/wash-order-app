@@ -161,16 +161,16 @@ export default function TodayPage() {
           style={{ paddingTop: 16, paddingBottom: "calc(env(safe-area-inset-bottom) + 90px)" }}>
 
           {/* 마스코트 */}
-          <div style={{ marginBottom: 2 }}>
-            <Kaechi mood="normal" size={68} />
+          <div style={{ marginBottom: 4 }}>
+            <Kaechi mood="normal" size={88} />
           </div>
 
           {/* 타이틀 */}
           <h1 className="text-center"
-            style={{ fontSize: 24, fontWeight: 900, color: "#1E2A22", letterSpacing: "-1px", lineHeight: 1.1 }}>
+            style={{ fontSize: 28, fontWeight: 900, color: "#1E2A22", letterSpacing: "-1px", lineHeight: 1.1 }}>
             오늘의 씻기 순서
           </h1>
-          <p className="text-center mt-1" style={{ fontSize: 13, color: "#5C6B60", fontWeight: 400, marginBottom: 10 }}>
+          <p className="text-center mt-1" style={{ fontSize: 14, color: "#5C6B60", fontWeight: 400, marginBottom: 12 }}>
             오늘은 어디부터 씻을까요?
           </p>
 

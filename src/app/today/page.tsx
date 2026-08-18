@@ -152,7 +152,7 @@ export default function TodayPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-dvh"
+    <div className="flex flex-col h-dvh overflow-hidden"
       style={{ background: "linear-gradient(180deg,#EAF7EE 0%,#D8F0E0 45%,#C7ECD9 100%)" }}>
 
       {/* ══════════════ SPIN 화면 ══════════════ */}

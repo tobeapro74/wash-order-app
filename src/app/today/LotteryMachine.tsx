@@ -179,7 +179,7 @@ export default function LotteryMachine({
         {!isDone && (
           <div style={{
             display: "flex", alignItems: "center",
-            gap: 6, flexWrap: "wrap", minHeight: 36,
+            gap: 4, flexWrap: "nowrap", minHeight: 36, overflow: "hidden",
           }}>
             {displayPicked.length === 0 && !isPlaying && (
               <p style={{ fontSize: 14, color: "#5C6B60", margin: 0, width: "100%", textAlign: "center" }}>
@@ -190,8 +190,8 @@ export default function LotteryMachine({
               <span key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <span style={{
                   background: "#D8F0E0", color: "#1F6E42",
-                  fontWeight: 800, fontSize: 15,
-                  padding: "6px 14px", borderRadius: 999,
+                  fontWeight: 800, fontSize: 13,
+                  padding: "5px 10px", borderRadius: 999, whiteSpace: "nowrap",
                 }}>
                   {i + 1}. {LABEL[id]}
                 </span>
@@ -207,8 +207,8 @@ export default function LotteryMachine({
                 )}
                 <span style={{
                   border: "2px dashed #9FE0B8", color: "#9FE0B8",
-                  fontWeight: 700, fontSize: 14,
-                  padding: "6px 12px", borderRadius: 999,
+                  fontWeight: 700, fontSize: 13,
+                  padding: "5px 10px", borderRadius: 999, whiteSpace: "nowrap",
                 }}>
                   {displayPicked.length + i + 1}번째
                 </span>

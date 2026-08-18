@@ -157,8 +157,8 @@ export default function TodayPage() {
 
       {/* ══════════════ SPIN 화면 ══════════════ */}
       {phase === "spin" && (
-        <div className="flex-1 flex flex-col items-center px-5 pb-28"
-          style={{ paddingTop: 56 }}>
+        <div className="flex-1 flex flex-col items-center px-5"
+          style={{ paddingTop: 56, paddingBottom: "calc(env(safe-area-inset-bottom) + 100px)" }}>
 
           {/* 마스코트 — 이미지 목표: 보라 로브+지팡이, 현재 에셋 기준 크게 */}
           <div style={{ marginBottom: 8 }}>

@@ -120,7 +120,7 @@ export default function LotteryMachine({
     }}>
 
       {/* ── 영상 ── */}
-      <div style={{ position: "relative", width: "100%", aspectRatio: "3/4", background: "#c8e8d4" }}>
+      <div style={{ position: "relative", width: "100%", aspectRatio: "1/1", background: "#c8e8d4" }}>
         <video
           ref={videoRef}
           src="/lottery-machine.mp4"

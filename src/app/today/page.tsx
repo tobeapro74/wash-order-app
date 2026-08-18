@@ -435,7 +435,8 @@ export default function TodayPage() {
       {showDislike && (
         <div className="fixed inset-0 z-50 flex flex-col justify-end">
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowDislike(false)} />
-          <div className="relative bg-white rounded-t-3xl p-6 z-10">
+          <div className="relative bg-white rounded-t-3xl z-10"
+            style={{ padding: "24px 28px 40px" }}>
             <div className="w-10 h-1 rounded-full mx-auto mb-5" style={{ background: "#D8F0E0" }} />
             <div className="flex items-center gap-3 mb-4">
               <Kaechi mood="question" size={44} animate={false} />
@@ -444,8 +445,8 @@ export default function TodayPage() {
             <div className="flex flex-col gap-2">
               {DISLIKE_REASONS.map((reason) => (
                 <button key={reason} onClick={handleDislikeConfirm}
-                  className="w-full text-left px-5 py-3 rounded-2xl text-sm font-semibold"
-                  style={{ background: "#EAF7EE", color: "#1E2A22" }}>
+                  className="w-full text-left rounded-2xl text-sm font-semibold"
+                  style={{ background: "#EAF7EE", color: "#1E2A22", padding: "12px 20px" }}>
                   {reason}
                 </button>
               ))}

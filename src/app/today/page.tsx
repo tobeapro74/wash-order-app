@@ -444,7 +444,7 @@ export default function TodayPage() {
             <div className="flex flex-col gap-2">
               {DISLIKE_REASONS.map((reason) => (
                 <button key={reason} onClick={handleDislikeConfirm}
-                  className="w-full text-left px-4 py-3 rounded-2xl text-sm font-semibold"
+                  className="w-full text-left px-5 py-3 rounded-2xl text-sm font-semibold"
                   style={{ background: "#EAF7EE", color: "#1E2A22" }}>
                   {reason}
                 </button>

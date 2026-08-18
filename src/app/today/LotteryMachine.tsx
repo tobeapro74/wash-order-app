@@ -182,7 +182,7 @@ export default function LotteryMachine({
             gap: 4, flexWrap: "nowrap", minHeight: 36, overflow: "hidden",
           }}>
             {displayPicked.length === 0 && !isPlaying && (
-              <p style={{ fontSize: 14, color: "#5C6B60", margin: 0, width: "100%", textAlign: "center" }}>
+              <p style={{ fontSize: 13, color: "#5C6B60", margin: 0, width: "100%", textAlign: "center", whiteSpace: "nowrap" }}>
                 ⭐ GO 버튼을 눌러 공을 뽑아보세요!
               </p>
             )}

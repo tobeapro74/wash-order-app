@@ -129,7 +129,7 @@ export default function BuildingPage() {
       </div>
 
       {/* ── 메인 ── */}
-      <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
+      <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative", paddingBottom: 72 }}>
 
         {/* 별 배경 */}
         <Stars />

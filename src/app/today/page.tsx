@@ -405,18 +405,6 @@ export default function TodayPage() {
 
       <BottomNav />
 
-      {/* 개발용 리셋 */}
-      <button
-        onClick={() => {
-          localStorage.removeItem("wash_today");
-          localStorage.removeItem("wash_voted_today");
-          setResultOrder(null);
-          setPhase("spin");
-        }}
-        className="fixed top-4 right-4 z-50 text-[10px] rounded px-2 py-1"
-        style={{ background: "rgba(0,0,0,0.08)", color: "rgba(0,0,0,0.3)" }}>
-        리셋
-      </button>
 
       {/* 싫어요 바텀시트 */}
       {showDislike && (

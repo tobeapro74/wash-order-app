@@ -54,7 +54,7 @@ export default function BuildingPage() {
   // SVG viewBox: 0~600, 빌딩 바닥 y=600, 꼭대기 y=18 → 유효 높이 582/600
   const targetBotPx = useCallback((floor: number) => {
     const H = wrapRef.current?.offsetHeight ?? 500;
-    const svgBuildingH = H * (582 / 600); // 실제 빌딩 구간 픽셀
+    const svgBuildingH = H * (582 / 600);
     const floorH = svgBuildingH / Math.max(total, 1);
     return Math.round((floor - 1) * floorH + floorH * 0.5);
   }, [total]);
@@ -139,10 +139,10 @@ export default function BuildingPage() {
           {/* marginBottom: 건물 전체를 위로 3층분 올림 (3/24 ≈ 12.5%) */}
           <div ref={wrapRef} style={{ position: "relative", width: 200, height: "88%", marginBottom: "6%" }}>
 
-            {/* 스카이라운지 뱃지 — 최상단 층 중간에 위치 */}
+            {/* 스카이라운지 뱃지 — 24층(최상단) 창문 중앙 높이에 위치 */}
             <div style={{
               position: "absolute",
-              bottom: "calc(97% - 2.5%)",
+              bottom: "calc(97% + 0.5%)",
               left: "50%", transform: "translateX(-50%)",
               background: "linear-gradient(135deg,#FCE18A,#F5C84B)",
               color: "#1a1000", fontSize: 10, fontWeight: 900,

@@ -148,7 +148,7 @@ export default function SetupPage() {
     if (next.length === 4) {
       saveMyOrder(next);
       apiSaveMyOrder(next);
-      router.push("/today");
+      setMyOrder(next); // 확인 화면으로 전환
     } else {
       setSelected(next);
     }

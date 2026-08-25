@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useLayoutEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   ElementId, loadMyOrder, loadScores, getRanking, orderKey, WASH_ELEMENTS,
@@ -34,6 +34,16 @@ export default function BuildingPage() {
   const panelRef     = useRef<HTMLDivElement>(null);
   const autoRan      = useRef(false);
   const currentFloor = useRef(0);
+  const [wrapH, setWrapH] = useState(0);
+
+  useLayoutEffect(() => {
+    const update = () => {
+      if (wrapRef.current) setWrapH(wrapRef.current.offsetHeight);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   useEffect(() => {
     const my = loadMyOrder();
@@ -52,15 +62,14 @@ export default function BuildingPage() {
   const myFloor = ranking.findIndex(r => orderKey(r.order) === myKey) + 1 || 0;
 
   // 엘리베이터 목표 bottom px 계산
-  // SVG viewBox 0 0 200 600, 건물: y=18(꼭대기)~y=600(바닥), FLOOR_H=582/total
-  // floor층 창문 중앙 svgY = 18 + (total-floor+0.5)*FLOOR_H
-  // CSS bottom(px) = (600 - svgY) / 600 * H - ELEV_HALF
+  // 창문 중앙 svgY = 18 + (total-floor)*FLOOR_H + FLOOR_H*0.5 (창문offset 0.225 + wh/2 ≈ 0.5)
+  // CSS bottom = (600 - svgY) / 600 * H - ELEV_HALF
   const targetBotPx = useCallback((floor: number) => {
-    const H = wrapRef.current?.offsetHeight ?? 500;
+    const H = wrapH || (wrapRef.current?.offsetHeight ?? 500);
     const FLOOR_H = 582 / Math.max(total, 1);
-    const svgY = 18 + (total - floor + 0.5) * FLOOR_H;
+    const svgY = 18 + (total - floor) * FLOOR_H + FLOOR_H * 0.5;
     return Math.round((600 - svgY) / 600 * H - ELEV_HALF);
-  }, [total]);
+  }, [total, wrapH]);
 
   // 층 선택 → 엘리베이터 이동
   const selectFloor = useCallback((floor: number, idx: number) => {

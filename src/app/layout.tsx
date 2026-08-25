@@ -33,8 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           async
         />
       </head>
-      <body className="min-h-dvh"
-        style={{ background: "linear-gradient(180deg,#EAF7EE 0%,#D8F0E0 45%,#C7ECD9 100%)" }}>
+      <body className="min-h-dvh">
         <main className="app-shell max-w-[480px] w-full mx-auto min-h-dvh relative">
           {children}
         </main>

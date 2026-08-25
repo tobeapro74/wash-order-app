@@ -238,8 +238,9 @@ export default function BuildingPage() {
                     {item.order.map(id => labelOf(id)).join("→")}
                   </div>
                 </div>
-                <div style={{ fontSize: 10, color: "#8BAFC8", whiteSpace: "nowrap" }}>
-                  👍{item.likes}
+                <div style={{ fontSize: 10, color: "#8BAFC8", whiteSpace: "nowrap", display: "flex", flexDirection: "column", gap: 1 }}>
+                  <span>👍{item.likes}</span>
+                  <span>👎{item.dislikes}</span>
                 </div>
               </button>
             );
@@ -293,8 +294,9 @@ export default function BuildingPage() {
                 </span>
               ))}
             </div>
-            <div style={{ fontSize: 11, color: "#8BAFC8", marginBottom: 10 }}>
-              👍 {ranking[ranking.findIndex((_, i) => total - i === popup.floor)]?.likes ?? 0}점
+            <div style={{ fontSize: 11, color: "#8BAFC8", marginBottom: 10, display: "flex", gap: 12, justifyContent: "center" }}>
+              <span>👍 {ranking[ranking.findIndex((_, i) => total - i === popup.floor)]?.likes ?? 0}</span>
+              <span>👎 {ranking[ranking.findIndex((_, i) => total - i === popup.floor)]?.dislikes ?? 0}</span>
             </div>
             <button
               onClick={() => setPopup(null)}

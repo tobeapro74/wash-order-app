@@ -34,13 +34,39 @@ html, body {
   height: 100%;
   font-family: 'Noto Sans KR', 'Apple SD Gothic Neo',
     'Malgun Gothic', -apple-system, sans-serif;
-  background: linear-gradient(180deg, #EAF7EE 0%, #D8F0E0 45%, #C7ECD9 100%);
+  background: #B8D8C4;
   background-attachment: fixed;
   color: var(--ink900);
   -webkit-font-smoothing: antialiased;
 }
 
-#__next, main { min-height: 100dvh; }
+/* 모바일: 전체화면, 데스크톱: 중앙 카드 */
+body > #__next,
+body > main {
+  min-height: 100dvh;
+}
+
+/* 앱 컨테이너: 데스크톱에서 중앙 카드로 */
+body main.app-shell {
+  background: linear-gradient(180deg, #EAF7EE 0%, #D8F0E0 45%, #C7ECD9 100%);
+  min-height: 100dvh;
+  position: relative;
+}
+
+@media (min-width: 520px) {
+  body {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 100dvh;
+    padding: 0;
+  }
+  body main.app-shell {
+    width: 480px;
+    min-height: 100dvh;
+    box-shadow: 0 0 60px rgba(0,0,0,0.18);
+  }
+}
 
 /* ── 공통 애니메이션 ── */
 @keyframes float {

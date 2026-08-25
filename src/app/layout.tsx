@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-dvh"
         style={{ background: "linear-gradient(180deg,#EAF7EE 0%,#D8F0E0 45%,#C7ECD9 100%)" }}>
-        <main className="max-w-md mx-auto min-h-dvh relative">
+        <main className="app-shell max-w-[480px] w-full mx-auto min-h-dvh relative">
           {children}
         </main>
       </body>

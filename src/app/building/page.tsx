@@ -18,7 +18,11 @@ import Image from "next/image";
 // 최상층=화면폭의 55%, 최하층=화면폭의 90% 사이를 균등 분배
 // 화면폭은 320~430px 사이로 클램프 (모바일 기준)
 function widthForFloor(floor: number, topFloor: number): number {
-  const vw = Math.min(Math.max(typeof window !== "undefined" ? window.innerWidth : 375, 320), 430);
+  // 앱 컨테이너는 최대 480px — 그 이상은 480으로 클램프
+  const containerW = typeof window !== "undefined"
+    ? Math.min(window.innerWidth, 480)
+    : 375;
+  const vw = Math.min(Math.max(containerW, 320), 480);
   const minW = Math.round(vw * 0.55);
   const maxW = Math.round(vw * 0.90);
   if (topFloor <= 1) return minW;

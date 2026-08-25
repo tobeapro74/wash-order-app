@@ -51,12 +51,13 @@ export default function BuildingPage() {
   const myFloor = ranking.findIndex(r => orderKey(r.order) === myKey) + 1 || 0;
 
   // 엘리베이터 목표 bottom px 계산
-  // SVG viewBox: 0~600, 빌딩 바닥 y=600, 꼭대기 y=18 → 유효 높이 582/600
+  // SVG: y=600 바닥, y=18 꼭대기, FLOOR_H=582/total
+  // floor(1-based)의 중앙 svgY = 600 - (floor - 0.5) * FLOOR_H
+  // CSS bottom = (600 - svgY) / 600 * wrapHeight = (floor - 0.5) * FLOOR_H / 600 * H
   const targetBotPx = useCallback((floor: number) => {
     const H = wrapRef.current?.offsetHeight ?? 500;
-    const svgBuildingH = H * (582 / 600);
-    const floorH = svgBuildingH / Math.max(total, 1);
-    return Math.round((floor - 1) * floorH + floorH * 0.5);
+    const FLOOR_H = 582 / Math.max(total, 1);
+    return Math.round((floor - 0.5) * FLOOR_H / 600 * H);
   }, [total]);
 
   // 층 선택 → 엘리베이터 이동

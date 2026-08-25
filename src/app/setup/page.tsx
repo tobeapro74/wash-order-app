@@ -156,78 +156,56 @@ export default function SetupPage() {
 
   return (
     <div className="flex flex-col min-h-dvh"
-      style={{ background: "linear-gradient(180deg,#F5F5F0 0%,#ECEEE8 45%,#E0E4D8 100%)" }}>
+      style={{ background: "#ECEEE8" }}>
 
-      {/* 진행 바 */}
-      <div className="flex gap-2 px-5 pt-14 pb-0">
-        {[0,1,2,3].map(i => (
-          <div key={i} className="h-1.5 flex-1 rounded-full transition-all duration-300"
-            style={{ background: i < step ? "#4D7A56" : "#C8CEC4" }} />
-        ))}
-      </div>
-
-      <div className="flex-1 flex flex-col items-center justify-center px-5 gap-5 pb-10">
-        <Kaechi mood="question" size={140} />
-
-        <div className="text-center">
-          <p className="text-xs font-bold tracking-widest mb-1.5" style={{ color: "#4D7A56" }}>
+      {/* 상단: 마스코트 + 질문 */}
+      <div className="flex flex-col items-center"
+        style={{ paddingTop: 56, paddingBottom: 24, background: "#ECEEE8" }}>
+        <Kaechi mood="question" size={160} />
+        <div className="text-center" style={{ marginTop: 8 }}>
+          <p style={{ fontSize: 13, fontWeight: 800, color: "#4D7A56", letterSpacing: "0.08em", marginBottom: 4 }}>
             {STEP_LABELS[step]}
           </p>
-          <p className="font-bold leading-snug" style={{ fontSize: 20, color: "#1C2E24" }}>
+          <p style={{ fontSize: 22, fontWeight: 900, color: "#1C2E24" }}>
             {STEP_QUESTIONS[step]}
           </p>
         </div>
+      </div>
 
-        {/* 선택된 순서 미리보기 */}
-        {selected.length > 0 && (
-          <div className="flex items-center gap-2 fade-up">
-            {selected.map((id, i) => {
-              const el = WASH_ELEMENTS.find(e => e.id === id)!;
-              return (
-                <span key={id} className="flex items-center gap-1.5">
-                  <span className="flex flex-col items-center gap-0.5">
-                    <Image src={WASH_CHAR[id]} alt={el.label}
-                      width={36} height={36} style={{ objectFit: "contain" }} />
-                    <span className="text-[10px] font-bold" style={{ color: "#4D6B5A" }}>{el.label}</span>
-                  </span>
-                  <span style={{ color: "#4D7A56", fontSize: 14 }}>→</span>
-                </span>
-              );
-            })}
-            <span className="text-2xl opacity-25">?</span>
-          </div>
-        )}
+      {/* 선택 버튼 2×2 그리드 */}
+      <div style={{ flex: 1, padding: "0 16px 100px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        {remaining.map(id => {
+          const el = WASH_ELEMENTS.find(e => e.id === id)!;
+          return (
+            <button key={id} onClick={() => handlePick(id)}
+              className="flex flex-col items-center active:scale-95 transition-transform"
+              style={{
+                background: "#FFFFFF",
+                borderRadius: 20,
+                padding: "28px 12px 20px",
+                boxShadow: "0 4px 16px rgba(28,58,43,0.08)",
+                border: "none", cursor: "pointer",
+                gap: 12,
+              }}>
+              <Image src={WASH_CHAR[id]} alt={el.label}
+                width={88} height={88} style={{ objectFit: "contain" }} />
+              <span style={{ fontSize: 17, fontWeight: 700, color: "#1C2E24" }}>
+                {el.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
 
-        {/* 선택 버튼 2×2 그리드 */}
-        <div className="w-full grid grid-cols-2 gap-3">
-          {remaining.map(id => {
-            const el = WASH_ELEMENTS.find(e => e.id === id)!;
-            return (
-              <button key={id} onClick={() => handlePick(id)}
-                className="flex flex-col items-center gap-2 rounded-2xl active:scale-95 transition-transform"
-                style={{
-                  background: "#FFFFFF",
-                  padding: "20px 12px",
-                  boxShadow: "0 6px 16px rgba(31,110,66,0.12)",
-                  border: "none",
-                }}>
-                <Image src={WASH_CHAR[id]} alt={el.label}
-                  width={64} height={64} style={{ objectFit: "contain" }} />
-                <span className="font-semibold" style={{ fontSize: 15, color: "#1E2A22" }}>
-                  {el.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {selected.length > 0 && (
+      {/* 이전으로 버튼 */}
+      {selected.length > 0 && (
+        <div className="fixed z-30 text-center" style={{ bottom: "calc(env(safe-area-inset-bottom) + 84px)", left: 0, right: 0 }}>
           <button onClick={() => setSelected(prev => prev.slice(0, -1))}
-            className="text-sm font-bold" style={{ color: "#5C6B60" }}>
+            style={{ fontSize: 13, fontWeight: 700, color: "#4D6B5A", background: "none", border: "none", cursor: "pointer" }}>
             ← 이전으로
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       <BottomNav />
     </div>

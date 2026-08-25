@@ -58,7 +58,7 @@ export default function BuildingPage() {
   const targetBotPx = useCallback((floor: number) => {
     const H = wrapRef.current?.offsetHeight ?? 500;
     const FLOOR_H = 582 / Math.max(total, 1);
-    return Math.round((total - floor + 0.5) * FLOOR_H / 600 * H);
+    return Math.round((floor - 0.5) * FLOOR_H / 600 * H);
   }, [total]);
 
   // 층 선택 → 엘리베이터 이동

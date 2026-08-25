@@ -33,6 +33,7 @@ export default function SetupPage() {
   useAuth();  // 비로그인 시 /login 리다이렉트
   const [myOrder, setMyOrder] = useState<ElementId[] | null | undefined>(undefined);
   const [selected, setSelected] = useState<ElementId[]>([]);
+  const [isNewSetup, setIsNewSetup] = useState(false);
 
   useEffect(() => {
     const local = loadMyOrder();
@@ -106,29 +107,33 @@ export default function SetupPage() {
             })}
           </div>
 
-          {/* 저장하기 버튼 */}
-          <button onClick={() => router.push("/today")}
-            style={{
-              marginTop: 28,
-              height: 52, padding: "0 40px",
-              borderRadius: 999,
-              background: "linear-gradient(180deg,#4D7A56 0%,#1C3A2B 100%)",
-              boxShadow: "0 6px 18px rgba(28,58,43,0.35)",
-              fontSize: 16, fontWeight: 700, color: "#fff",
-              border: "none", cursor: "pointer",
-            }}>
-            저장하기
-          </button>
+          {/* 저장하기 / 순서 초기화 — 새로 설정한 경우에만 표시 */}
+          {isNewSetup && (
+            <>
+              <button onClick={() => router.push("/today")}
+                style={{
+                  marginTop: 28,
+                  height: 52, padding: "0 40px",
+                  borderRadius: 999,
+                  background: "linear-gradient(180deg,#4D7A56 0%,#1C3A2B 100%)",
+                  boxShadow: "0 6px 18px rgba(28,58,43,0.35)",
+                  fontSize: 16, fontWeight: 700, color: "#fff",
+                  border: "none", cursor: "pointer",
+                }}>
+                저장하기
+              </button>
 
-          <button
-            onClick={() => { localStorage.removeItem("wash_my_order"); setMyOrder(null); }}
-            style={{
-              marginTop: 12,
-              background: "none", border: "none", cursor: "pointer",
-              fontSize: 12, color: "#4D6B5A",
-            }}>
-            순서 초기화
-          </button>
+              <button
+                onClick={() => { localStorage.removeItem("wash_my_order"); setIsNewSetup(false); setMyOrder(null); }}
+                style={{
+                  marginTop: 12,
+                  background: "none", border: "none", cursor: "pointer",
+                  fontSize: 12, color: "#4D6B5A",
+                }}>
+                순서 초기화
+              </button>
+            </>
+          )}
         </div>
 
         <BottomNav />
@@ -148,6 +153,7 @@ export default function SetupPage() {
     if (next.length === 4) {
       saveMyOrder(next);
       apiSaveMyOrder(next);
+      setIsNewSetup(true);
       setMyOrder(next); // 확인 화면으로 전환
     } else {
       setSelected(next);
@@ -173,7 +179,7 @@ export default function SetupPage() {
       </div>
 
       {/* 선택 버튼 2×2 그리드 */}
-      <div style={{ flex: 1, padding: "0 16px 100px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div style={{ flex: 1, padding: "0 16px 100px", display: "grid", gridTemplateColumns: "1fr 1fr", gridTemplateRows: "1fr 1fr", alignContent: "start", gap: 12 }}>
         {remaining.map(id => {
           const el = WASH_ELEMENTS.find(e => e.id === id)!;
           return (
@@ -186,6 +192,7 @@ export default function SetupPage() {
                 boxShadow: "0 4px 16px rgba(28,58,43,0.08)",
                 border: "none", cursor: "pointer",
                 gap: 12,
+                height: 160,
               }}>
               <Image src={WASH_CHAR[id]} alt={el.label}
                 width={88} height={88} style={{ objectFit: "contain" }} />

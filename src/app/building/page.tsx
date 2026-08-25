@@ -10,6 +10,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { useAuth } from "@/hooks/useAuth";
 
 type RankItem = { order: ElementId[]; score: number; likes: number; dislikes: number };
+const ELEV_HALF = 14; // 엘베 높이 28px의 절반
 
 function labelOf(id: ElementId) {
   return WASH_ELEMENTS.find(e => e.id === id)?.label ?? id;
@@ -51,14 +52,14 @@ export default function BuildingPage() {
   const myFloor = ranking.findIndex(r => orderKey(r.order) === myKey) + 1 || 0;
 
   // 엘리베이터 목표 bottom px 계산
-  // SVG: y=600 바닥, y=18 꼭대기, FLOOR_H=582/total
-  // f=0→최상층(floor=total), f=total-1→1층
-  // floor의 창문 중앙 svgY = 600 - (total - floor + 0.5) * FLOOR_H
-  // CSS bottom = (600 - svgY) / 600 * H = (total - floor + 0.5) * FLOOR_H / 600 * H
+  // SVG viewBox 0 0 200 600, 건물: y=18(꼭대기)~y=600(바닥), FLOOR_H=582/total
+  // floor층 창문 중앙 svgY = 18 + (total-floor+0.5)*FLOOR_H
+  // CSS bottom(px) = (600 - svgY) / 600 * H - ELEV_HALF
   const targetBotPx = useCallback((floor: number) => {
     const H = wrapRef.current?.offsetHeight ?? 500;
     const FLOOR_H = 582 / Math.max(total, 1);
-    return Math.round((floor - 0.5) * FLOOR_H / 600 * H);
+    const svgY = 18 + (total - floor + 0.5) * FLOOR_H;
+    return Math.round((600 - svgY) / 600 * H - ELEV_HALF);
   }, [total]);
 
   // 층 선택 → 엘리베이터 이동
@@ -374,12 +375,13 @@ function BuildingSvg({ total, litFloor }: { total: number; litFloor: number }) {
   const lines: { y: number }[] = [];
 
   for (let f = 0; f < total; f++) {
-    const floor = total - f;
-    const y = 600 - (f + 1) * FLOOR_H;
+    const floor = total - f; // f=0→최상층(total층), f=total-1→1층
+    // SVG y: 건물 꼭대기 y=18, 바닥 y=600, 위에서 아래로 증가
+    const y = 18 + f * FLOOR_H; // 해당 층의 상단 y좌표
     const lit = floor === litFloor;
     const wh = Math.max(FLOOR_H * 0.55, 4);
-    wins.push({ x: 44, y: y + FLOOR_H * 0.2, w: 16, h: wh, lit });
-    wins.push({ x: 140, y: y + FLOOR_H * 0.2, w: 16, h: wh, lit });
+    wins.push({ x: 44, y: y + FLOOR_H * 0.225, w: 16, h: wh, lit });
+    wins.push({ x: 140, y: y + FLOOR_H * 0.225, w: 16, h: wh, lit });
     lines.push({ y: y + FLOOR_H });
   }
 

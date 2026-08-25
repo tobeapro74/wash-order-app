@@ -51,9 +51,12 @@ export default function BuildingPage() {
   const myFloor = ranking.findIndex(r => orderKey(r.order) === myKey) + 1 || 0;
 
   // 엘리베이터 목표 bottom px 계산
+  // SVG viewBox: 0~600, 빌딩 바닥 y=600, 꼭대기 y=18 → 유효 높이 582/600
   const targetBotPx = useCallback((floor: number) => {
     const H = wrapRef.current?.offsetHeight ?? 500;
-    return Math.round(((floor - 0.5) / Math.max(total, 1)) * H);
+    const svgBuildingH = H * (582 / 600); // 실제 빌딩 구간 픽셀
+    const floorH = svgBuildingH / Math.max(total, 1);
+    return Math.round((floor - 1) * floorH + floorH * 0.5);
   }, [total]);
 
   // 층 선택 → 엘리베이터 이동
@@ -134,9 +137,11 @@ export default function BuildingPage() {
         <div style={{ flex: 1, position: "relative", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 1 }}>
           <div ref={wrapRef} style={{ position: "relative", width: 200, height: "100%" }}>
 
-            {/* 스카이라운지 뱃지 */}
+            {/* 스카이라운지 뱃지 — SVG 빌딩 꼭대기(bottom 97%)에 고정 */}
             <div style={{
-              position: "absolute", top: 8, left: "50%", transform: "translateX(-50%)",
+              position: "absolute",
+              bottom: "calc(97% - 12px)",
+              left: "50%", transform: "translateX(-50%)",
               background: "linear-gradient(135deg,#FCE18A,#F5C84B)",
               color: "#1a1000", fontSize: 10, fontWeight: 900,
               padding: "3px 12px", borderRadius: 999,
@@ -148,7 +153,7 @@ export default function BuildingPage() {
             </div>
 
             {/* 빌딩 SVG */}
-            <BuildingSvg total={TOTAL_FLOORS} myFloor={myFloor} />
+            <BuildingSvg total={TOTAL_FLOORS} litFloor={moving ? 0 : (popup?.floor ?? 0)} />
 
             {/* 엘리베이터 */}
             <div style={{
@@ -359,15 +364,15 @@ function Stars() {
 }
 
 /* ── 빌딩 SVG ── */
-function BuildingSvg({ total, myFloor }: { total: number; myFloor: number }) {
-  const FLOOR_H = total > 0 ? 580 / total : 24;
+function BuildingSvg({ total, litFloor }: { total: number; litFloor: number }) {
+  const FLOOR_H = total > 0 ? 582 / total : 24;
   const wins: { x: number; y: number; w: number; h: number; lit: boolean }[] = [];
   const lines: { y: number }[] = [];
 
   for (let f = 0; f < total; f++) {
     const floor = total - f;
     const y = 600 - (f + 1) * FLOOR_H;
-    const lit = floor === myFloor;
+    const lit = floor === litFloor;
     const wh = Math.max(FLOOR_H * 0.55, 4);
     wins.push({ x: 44, y: y + FLOOR_H * 0.2, w: 16, h: wh, lit });
     wins.push({ x: 140, y: y + FLOOR_H * 0.2, w: 16, h: wh, lit });
@@ -375,7 +380,7 @@ function BuildingSvg({ total, myFloor }: { total: number; myFloor: number }) {
   }
 
   return (
-    <svg viewBox="0 0 200 600" width="200" style={{ position: "absolute", bottom: 0, left: 0, zIndex: 3 }}>
+    <svg viewBox="0 0 200 600" width="100%" style={{ position: "absolute", bottom: 0, left: 0, zIndex: 3, width: "100%" }}>
       <defs>
         <linearGradient id="bg1" x1="0" x2="1" y1="0" y2="0">
           <stop offset="0%" stopColor="#1E3A5F"/>

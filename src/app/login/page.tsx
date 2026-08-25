@@ -35,21 +35,21 @@ export default function LoginPage() {
       alignItems: "center",
       justifyContent: "center",
       padding: "0 24px",
-      background: "linear-gradient(180deg,#EAF7EE 0%,#D8F0E0 45%,#C7ECD9 100%)",
+      background: "linear-gradient(180deg,#F5F5F0 0%,#ECEEE8 45%,#E0E4D8 100%)",
     }}>
       <div style={{ marginBottom: 24 }}>
         <Kaechi mood="wave" size={140} animate />
       </div>
 
       <h1 style={{
-        fontSize: 32, fontWeight: 900, color: "#1E2A22",
+        fontSize: 32, fontWeight: 900, color: "#1C2E24",
         textAlign: "center", lineHeight: 1.2, letterSpacing: "-0.5px",
         marginBottom: 10,
       }}>
         오늘은<br/>어디부터 씻을까요?
       </h1>
       <p style={{
-        fontSize: 15, color: "#5C6B60", textAlign: "center",
+        fontSize: 15, color: "#4D6B5A", textAlign: "center",
         lineHeight: 1.6, marginBottom: 48,
       }}>
         씻기 요정과 함께<br/>나만의 씻기 루틴을 만들어요 🐥
@@ -77,7 +77,7 @@ export default function LoginPage() {
       </button>
 
       <p style={{
-        marginTop: 20, fontSize: 12, color: "#5C6B60",
+        marginTop: 20, fontSize: 12, color: "#4D6B5A",
         textAlign: "center", lineHeight: 1.6,
       }}>
         로그인 시 닉네임·프로필 사진 제공에 동의하게 됩니다

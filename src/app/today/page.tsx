@@ -23,21 +23,21 @@ function DottedArrow() {
       style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
       <defs>
         <marker id="arr" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
-          <path d="M0,0 L0,8 L8,4 Z" fill="#3FA96B"/>
+          <path d="M0,0 L0,8 L8,4 Z" fill="#4D7A56"/>
         </marker>
       </defs>
       {/* 시계방향 4호: top→right→bottom→left */}
       <path d="M 100 45  A 85 85 0 0 1 215 100" fill="none"
-        stroke="#3FA96B" strokeWidth="2.5" strokeDasharray="4 5"
+        stroke="#4D7A56" strokeWidth="2.5" strokeDasharray="4 5"
         strokeLinecap="round" markerEnd="url(#arr)" />
       <path d="M 215 160 A 85 85 0 0 1 160 215" fill="none"
-        stroke="#3FA96B" strokeWidth="2.5" strokeDasharray="4 5"
+        stroke="#4D7A56" strokeWidth="2.5" strokeDasharray="4 5"
         strokeLinecap="round" markerEnd="url(#arr)" />
       <path d="M 100 215 A 85 85 0 0 1 45 160" fill="none"
-        stroke="#3FA96B" strokeWidth="2.5" strokeDasharray="4 5"
+        stroke="#4D7A56" strokeWidth="2.5" strokeDasharray="4 5"
         strokeLinecap="round" markerEnd="url(#arr)" />
       <path d="M 45 100  A 85 85 0 0 1 100 45" fill="none"
-        stroke="#3FA96B" strokeWidth="2.5" strokeDasharray="4 5"
+        stroke="#4D7A56" strokeWidth="2.5" strokeDasharray="4 5"
         strokeLinecap="round" markerEnd="url(#arr)" />
     </svg>
   );
@@ -73,7 +73,7 @@ function OrderGrid({ order, showConfetti, isJoker, mood }: {
             {i === 0 && (
               <div style={{
                 position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)",
-                background: "linear-gradient(180deg,#3FA96B 0%,#2E8C56 100%)",
+                background: "linear-gradient(180deg,#4D7A56 0%,#1C3A2B 100%)",
                 borderRadius: 999, padding: "2px 10px",
                 fontSize: 11, fontWeight: 800, color: "#fff",
                 letterSpacing: "0.05em", whiteSpace: "nowrap",
@@ -85,7 +85,7 @@ function OrderGrid({ order, showConfetti, isJoker, mood }: {
             )}
             <Image src={WASH_CHAR[id]} alt={el.label}
               width={88} height={88} style={{ objectFit: "contain" }} />
-            <span style={{ fontSize: 14, fontWeight: 600, color: "#1E2A22" }}>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "#1C2E24" }}>
               {el.label}
             </span>
           </div>
@@ -152,7 +152,7 @@ export default function TodayPage() {
   };
 
   return (
-    <div style={{ background: "linear-gradient(180deg,#EAF7EE 0%,#D8F0E0 45%,#C7ECD9 100%)", minHeight: "100dvh" }}>
+    <div style={{ background: "linear-gradient(180deg,#F5F5F0 0%,#ECEEE8 45%,#E0E4D8 100%)", minHeight: "100dvh" }}>
 
       {/* ══════════════ SPIN 화면 ══════════════ */}
       {phase === "spin" && (
@@ -164,10 +164,10 @@ export default function TodayPage() {
           </div>
 
           <h1 className="text-center"
-            style={{ fontSize: 26, fontWeight: 900, color: "#1E2A22", letterSpacing: "-1px", lineHeight: 1.1 }}>
+            style={{ fontSize: 26, fontWeight: 900, color: "#1C2E24", letterSpacing: "-1px", lineHeight: 1.1 }}>
             오늘의 씻기 순서
           </h1>
-          <p className="text-center mt-1" style={{ fontSize: 13, color: "#5C6B60", fontWeight: 400, marginBottom: 8 }}>
+          <p className="text-center mt-1" style={{ fontSize: 13, color: "#4D6B5A", fontWeight: 400, marginBottom: 8 }}>
             오늘은 어디부터 씻을까요?
           </p>
 
@@ -225,7 +225,7 @@ export default function TodayPage() {
             alignSelf: "flex-end", marginTop: -12, marginBottom: 4,
             background: "rgba(255,255,255,0.92)",
             borderRadius: 999, padding: "8px 16px",
-            fontSize: 14, fontWeight: 500, color: "#1F6E42",
+            fontSize: 14, fontWeight: 500, color: "#1C3A2B",
             boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
             position: "relative",
           }}>
@@ -248,7 +248,7 @@ export default function TodayPage() {
             padding: "24px 16px",
             background: isJoker
               ? "linear-gradient(180deg,#FBEFC9 0%,#F7E8B8 100%)"
-              : "linear-gradient(180deg,#FFFFFF 0%,#D8F0E0 100%)",
+              : "linear-gradient(180deg,#FFFFFF 0%,#E0E4D8 100%)",
             boxShadow: "0 10px 24px rgba(31,110,66,0.12)",
             marginBottom: 20,
           }}>
@@ -277,14 +277,14 @@ export default function TodayPage() {
                     }}>
                       <div style={{
                         width: 54, height: 54, borderRadius: "50%",
-                        background: "#D8F0E0",
+                        background: "#E0E4D8",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         boxShadow: "inset 0 2px 4px rgba(0,0,0,0.04)",
                       }}>
                         <Image src={WASH_CHAR[id]} alt={el.label}
                           width={44} height={44} style={{ objectFit: "contain" }} />
                       </div>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: "#1E2A22" }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: "#1C2E24" }}>
                         {el.label}
                       </span>
                     </div>
@@ -310,7 +310,7 @@ export default function TodayPage() {
           <div style={{ width: "100%", display: "flex", gap: 12, marginBottom: 16 }}>
             <button onClick={handleLike} style={{
               flex: 1, height: 60, borderRadius: 999, border: "none",
-              background: "linear-gradient(180deg,#4CBE7C 0%,#2E8C56 100%)",
+              background: "linear-gradient(180deg,#4D7A56 0%,#1C3A2B 100%)",
               color: "#fff", fontSize: 17, fontWeight: 700,
               display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
               boxShadow: "0 8px 20px rgba(46,140,86,0.35)",
@@ -334,7 +334,7 @@ export default function TodayPage() {
           {/* 빌딩 순위 보기 — 세컨더리 pill */}
           <button onClick={() => router.push("/building")} style={{
             height: 44, padding: "0 24px", borderRadius: 999, border: "none",
-            background: "#D8F0E0", color: "#1F6E42",
+            background: "#E0E4D8", color: "#1C3A2B",
             fontSize: 15, fontWeight: 600, cursor: "pointer",
             boxShadow: "0 2px 8px rgba(31,110,66,0.10)",
           }}>
@@ -361,7 +361,7 @@ export default function TodayPage() {
           {/* 순서 카드 */}
           <div className="w-full bounce-in"
             style={{
-              background: "#D8F0E0",
+              background: "#E0E4D8",
               borderRadius: 24,
               padding: 24,
               boxShadow: "0 6px 20px rgba(31,110,66,0.13)",
@@ -382,7 +382,7 @@ export default function TodayPage() {
               <p style={{ fontSize: 15, fontWeight: 700, color: "#1F6E42" }}>
                 오늘 평가를 완료했어요 ✅
               </p>
-              <p style={{ fontSize: 13, color: "#5C6B60", lineHeight: 1.6, marginTop: 6 }}>
+              <p style={{ fontSize: 13, color: "#4D6B5A", lineHeight: 1.6, marginTop: 6 }}>
                 내일 아침에 다시 돌아와요!<br/>씻기 요정 캐치가 기다리고 있을게요 🐥
               </p>
             </div>
@@ -393,7 +393,7 @@ export default function TodayPage() {
             style={{
               width: "100%", marginTop: 20,
               height: 56, borderRadius: 999,
-              background: "linear-gradient(180deg,#4CBE7C 0%,#2E8C56 100%)",
+              background: "linear-gradient(180deg,#4D7A56 0%,#1C3A2B 100%)",
               boxShadow: "0 8px 20px rgba(46,140,86,0.35)",
               fontSize: 17, fontWeight: 700, color: "#FFFFFF",
               letterSpacing: "0.02em", border: "none", cursor: "pointer",
@@ -424,16 +424,16 @@ export default function TodayPage() {
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowDislike(false)} />
           <div className="relative bg-white rounded-t-3xl z-10"
             style={{ padding: "24px 28px 40px" }}>
-            <div className="w-10 h-1 rounded-full mx-auto mb-5" style={{ background: "#D8F0E0" }} />
+            <div className="w-10 h-1 rounded-full mx-auto mb-5" style={{ background: "#C8CEC4" }} />
             <div className="flex items-center gap-3 mb-4">
               <Kaechi mood="question" size={44} animate={false} />
-              <p className="font-bold text-base" style={{ color: "#1E2A22" }}>어떤 점이 싫었나요?</p>
+              <p className="font-bold text-base" style={{ color: "#1C2E24" }}>어떤 점이 싫었나요?</p>
             </div>
             <div className="flex flex-col gap-2">
               {DISLIKE_REASONS.map((reason) => (
                 <button key={reason} onClick={handleDislikeConfirm}
                   className="w-full text-left rounded-2xl text-sm font-semibold"
-                  style={{ background: "#EAF7EE", color: "#1E2A22", padding: "12px 20px" }}>
+                  style={{ background: "#E8EDE6", color: "#1C2E24", padding: "12px 20px" }}>
                   {reason}
                 </button>
               ))}

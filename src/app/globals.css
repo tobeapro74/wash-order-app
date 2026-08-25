@@ -1,28 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  /* Design Tokens — 씻기순서 리디자인 */
-  --mint50:       #EAF7EE;
-  --mint100:      #D8F0E0;
-  --mint200:      #C7ECD9;
-  --mint300:      #9FE0B8;
-  --green500:     #3FA96B;
-  --green600:     #2E8C56;
-  --green700:     #1F6E42;
+  /* Design Tokens — 미니멀 모카 */
+  --sage50:       #F5F5F0;
+  --sage100:      #ECEEE8;
+  --sage200:      #E0E4D8;
+  --sage300:      #C8CEC4;
+  --forest700:    #1C3A2B;
+  --forest600:    #2A5240;
+  --forest500:    #4D7A56;
+  --lime400:      #B5E550;
+  --lime600:      #8AB830;
   --gold400:      #F5C84B;
   --gold600:      #D89B1F;
-  --purple500:    #7C6FE0;
-  --pink200:      #F7CFE0;
-  --lavender200:  #DCD6F5;
-  --cream200:     #FBEFC9;
-  --ink900:       #1E2A22;
-  --ink500:       #5C6B60;
+  --ink900:       #1C2E24;
+  --ink500:       #4D6B5A;
   --white:        #FFFFFF;
 
   /* 하위 호환 */
-  --primary:        var(--green500);
-  --primary-dark:   var(--green700);
-  --primary-light:  var(--mint50);
+  --primary:        var(--forest500);
+  --primary-dark:   var(--forest700);
+  --primary-light:  var(--sage50);
   --surface:        var(--white);
   --text:           var(--ink900);
   --text-sub:       var(--ink500);
@@ -39,7 +37,7 @@ body {
   font-family: 'Noto Sans KR', 'Apple SD Gothic Neo',
     'Malgun Gothic', -apple-system, sans-serif;
   /* 데스크톱/가로모드: 앱 카드 바깥 배경 */
-  background: #A8CCB8;
+  background: #C8CEC4;
   color: var(--ink900);
   -webkit-font-smoothing: antialiased;
   /* 항상 중앙 정렬 */
@@ -53,7 +51,7 @@ main.app-shell {
   max-width: 480px;
   min-height: 100dvh;
   position: relative;
-  background: linear-gradient(180deg, #EAF7EE 0%, #D8F0E0 45%, #C7ECD9 100%);
+  background: linear-gradient(180deg, #F5F5F0 0%, #ECEEE8 45%, #E0E4D8 100%);
   /* 데스크톱에서 카드처럼 그림자 */
   box-shadow: 0 0 40px rgba(0,0,0,0.12);
 }
@@ -95,12 +93,12 @@ main.app-shell {
 
 /* 3D 버튼 */
 .btn-primary {
-  background: linear-gradient(180deg, #4CBE7C 0%, #2E8C56 100%);
-  box-shadow: 0 8px 20px rgba(46,140,86,0.35);
+  background: linear-gradient(180deg, #4D7A56 0%, #1C3A2B 100%);
+  box-shadow: 0 8px 20px rgba(28,58,43,0.35);
   border-radius: 999px;
   transition: transform 0.1s, box-shadow 0.1s;
 }
 .btn-primary:active {
   transform: translateY(4px);
-  box-shadow: 0 2px 8px rgba(46,140,86,0.2);
+  box-shadow: 0 2px 8px rgba(28,58,43,0.2);
 }

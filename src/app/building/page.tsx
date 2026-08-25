@@ -91,8 +91,8 @@ export default function BuildingPage() {
       height: "100dvh",
       display: "flex",
       flexDirection: "column",
-      background: "#0B1629",
-      color: "#E8F4FF",
+      background: "#0E1A14",
+      color: "#E8F0EC",
       overflow: "hidden",
     }}>
 
@@ -100,7 +100,7 @@ export default function BuildingPage() {
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "16px 20px 10px",
-        background: "linear-gradient(180deg,#0B1629 0%,transparent 100%)",
+        background: "linear-gradient(180deg,#0E1A14 0%,transparent 100%)",
         flexShrink: 0, zIndex: 10,
       }}>
         <div>
@@ -117,10 +117,11 @@ export default function BuildingPage() {
         </div>
         {myFloor > 0 && (
           <div style={{
-            background: "#4CBE7C", color: "#fff",
+            background: "#1C3A2B", color: "#B5E550",
             fontSize: 12, fontWeight: 700,
             padding: "6px 14px", borderRadius: 999,
-            boxShadow: "0 0 16px rgba(76,190,124,0.4)",
+            boxShadow: "0 0 16px rgba(181,229,80,0.3)",
+            border: "1px solid rgba(181,229,80,0.3)",
           }}>
             내 층: {myFloor}F
           </div>
@@ -135,12 +136,13 @@ export default function BuildingPage() {
 
         {/* ── 빌딩 ── */}
         <div style={{ flex: 1, position: "relative", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 1 }}>
-          <div ref={wrapRef} style={{ position: "relative", width: 200, height: "100%" }}>
+          {/* marginBottom: 건물 전체를 위로 3층분 올림 (3/24 ≈ 12.5%) */}
+          <div ref={wrapRef} style={{ position: "relative", width: 200, height: "88%", marginBottom: "6%" }}>
 
-            {/* 스카이라운지 뱃지 — SVG 빌딩 꼭대기(bottom 97%)에 고정 */}
+            {/* 스카이라운지 뱃지 — 최상단 층 중간에 위치 */}
             <div style={{
               position: "absolute",
-              bottom: "calc(97% - 12px)",
+              bottom: "calc(97% - 2.5%)",
               left: "50%", transform: "translateX(-50%)",
               background: "linear-gradient(135deg,#FCE18A,#F5C84B)",
               color: "#1a1000", fontSize: 10, fontWeight: 900,
@@ -200,7 +202,7 @@ export default function BuildingPage() {
           gap: 4,
           flexShrink: 0,
           zIndex: 5,
-          background: "linear-gradient(90deg,transparent 0%,rgba(11,22,41,0.6) 100%)",
+          background: "linear-gradient(90deg,transparent 0%,rgba(14,26,20,0.7) 100%)",
         }}>
           {ranking.map((item, i) => {
             const floor  = total - i;
@@ -214,12 +216,12 @@ export default function BuildingPage() {
                 style={{
                   display: "flex", alignItems: "center", gap: 8,
                   padding: "7px 10px", borderRadius: 8,
-                  border: `1px solid ${isAct ? "#F5C84B" : isMine ? "#4CBE7C" : "transparent"}`,
+                  border: `1px solid ${isAct ? "#B5E550" : isMine ? "#4D7A56" : "transparent"}`,
                   background: isAct
-                    ? "rgba(245,200,75,0.15)"
+                    ? "rgba(181,229,80,0.15)"
                     : isMine
-                    ? "rgba(46,140,86,0.25)"
-                    : "rgba(30,58,95,0.4)",
+                    ? "rgba(28,58,43,0.5)"
+                    : "rgba(28,58,43,0.25)",
                   cursor: "pointer",
                   color: "#E8F4FF",
                   textAlign: "left",
@@ -230,7 +232,7 @@ export default function BuildingPage() {
               >
                 <div style={{
                   fontWeight: 900, fontSize: 17, lineHeight: 1,
-                  color: isAct ? "#F5C84B" : isMine ? "#4CBE7C" : "#F5C84B",
+                  color: isAct ? "#B5E550" : isMine ? "#B5E550" : "#B5E550",
                   minWidth: 30,
                 }}>
                   {floor}F
@@ -259,14 +261,14 @@ export default function BuildingPage() {
             bottom: 80,
             left: "50%",
             transform: "translateX(-50%)",
-            background: "rgba(17,34,64,0.97)",
-            border: "1px solid rgba(245,200,75,0.4)",
+            background: "rgba(12,22,16,0.97)",
+            border: "1px solid rgba(181,229,80,0.35)",
             borderRadius: 20,
             padding: "18px 22px",
             minWidth: 220,
             maxWidth: 280,
             zIndex: 50,
-            boxShadow: "0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(245,200,75,0.2)",
+            boxShadow: "0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(181,229,80,0.15)",
             textAlign: "center",
             animation: "fadeUp 0.3s ease",
           }}>
@@ -383,23 +385,23 @@ function BuildingSvg({ total, litFloor }: { total: number; litFloor: number }) {
     <svg viewBox="0 0 200 600" width="100%" style={{ position: "absolute", bottom: 0, left: 0, zIndex: 3, width: "100%" }}>
       <defs>
         <linearGradient id="bg1" x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0%" stopColor="#1E3A5F"/>
-          <stop offset="50%" stopColor="#2A4A6B"/>
-          <stop offset="100%" stopColor="#152E50"/>
+          <stop offset="0%" stopColor="#1C3A2B"/>
+          <stop offset="50%" stopColor="#2A5240"/>
+          <stop offset="100%" stopColor="#142B1F"/>
         </linearGradient>
         <linearGradient id="bg2" x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0%" stopColor="#152E50"/>
-          <stop offset="50%" stopColor="#1E3A5F"/>
-          <stop offset="100%" stopColor="#0E2040"/>
+          <stop offset="0%" stopColor="#142B1F"/>
+          <stop offset="50%" stopColor="#1C3A2B"/>
+          <stop offset="100%" stopColor="#0E1F16"/>
         </linearGradient>
         <linearGradient id="shaft" x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0%" stopColor="#0a1825"/>
-          <stop offset="50%" stopColor="#1a2f45"/>
-          <stop offset="100%" stopColor="#0a1825"/>
+          <stop offset="0%" stopColor="#080F0A"/>
+          <stop offset="50%" stopColor="#152B1C"/>
+          <stop offset="100%" stopColor="#080F0A"/>
         </linearGradient>
         <linearGradient id="ant" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor="#8BAFC8"/>
-          <stop offset="100%" stopColor="#2A4A6B"/>
+          <stop offset="0%" stopColor="#7AA88A"/>
+          <stop offset="100%" stopColor="#2A5240"/>
         </linearGradient>
       </defs>
 
@@ -411,8 +413,8 @@ function BuildingSvg({ total, litFloor }: { total: number; litFloor: number }) {
       {/* 창문 */}
       {wins.map((w, i) => (
         <rect key={i} x={w.x} y={w.y} width={w.w} height={w.h} rx="2"
-          fill={w.lit ? "#FFEAA0" : "#7BB8D4"}
-          opacity={w.lit ? 0.9 : 0.45}/>
+          fill={w.lit ? "#B5E550" : "#4D7A56"}
+          opacity={w.lit ? 0.95 : 0.4}/>
       ))}
 
       {/* 층 구분선 */}
@@ -429,7 +431,7 @@ function BuildingSvg({ total, litFloor }: { total: number; litFloor: number }) {
       <line x1="106" y1="18" x2="106" y2="600" stroke="#1a3050" strokeWidth="1.2"/>
 
       {/* 꼭대기 연결 */}
-      <polygon points="88,18 100,6 112,18" fill="#2A4A6B"/>
+      <polygon points="88,18 100,6 112,18" fill="#2A5240"/>
 
       {/* 안테나 */}
       <line x1="54" y1="80" x2="54" y2="0" stroke="url(#ant)" strokeWidth="1.8"/>

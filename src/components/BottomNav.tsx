@@ -50,11 +50,12 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40 bg-white"
+      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] z-40"
       style={{
-        borderTop: "1px solid #EDEDED",
+        background: "#1C3A2B",
+        borderTop: "1px solid rgba(181,229,80,0.1)",
         paddingBottom: "env(safe-area-inset-bottom)",
-        boxShadow: "0 -2px 12px rgba(0,0,0,0.05)",
+        boxShadow: "0 -2px 16px rgba(0,0,0,0.25)",
         minHeight: 72,
       }}
     >
@@ -74,13 +75,13 @@ export function BottomNav() {
                 <span
                   className="flex items-center justify-center rounded-full px-5 py-2"
                   style={{
-                    background: "rgba(63,169,107,0.13)",
+                    background: "rgba(181,229,80,0.15)",
                     minWidth: 88,
                   }}
                 >
                   <span
                     className="text-[13px] font-bold"
-                    style={{ color: "#1F6E42" }}
+                    style={{ color: "#B5E550" }}
                   >
                     {tab.label}
                   </span>
@@ -88,10 +89,10 @@ export function BottomNav() {
               ) : (
                 /* 비활성: 아이콘 + 라벨 */
                 <>
-                  <span style={{ color: "#5C6B60" }}>{tab.icon}</span>
+                  <span style={{ color: "rgba(255,255,255,0.45)" }}>{tab.icon}</span>
                   <span
                     className="text-[11px] font-medium"
-                    style={{ color: "#5C6B60" }}
+                    style={{ color: "rgba(255,255,255,0.45)" }}
                   >
                     {tab.label}
                   </span>

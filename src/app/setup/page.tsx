@@ -47,12 +47,12 @@ export default function SetupPage() {
   if (myOrder !== undefined && myOrder !== null) {
     return (
       <div className="flex flex-col min-h-dvh"
-        style={{ background: "linear-gradient(180deg,#EAF7EE 0%,#D8F0E0 45%,#C7ECD9 100%)" }}>
+        style={{ background: "linear-gradient(180deg,#F5F5F0 0%,#ECEEE8 45%,#E0E4D8 100%)" }}>
 
         {/* 헤더: 타이틀 좌측 + 마스코트 우측 */}
         <div className="flex items-center justify-between" style={{ paddingTop: 60, paddingBottom: 20, paddingLeft: 28, paddingRight: 20 }}>
           <h1 style={{
-            fontSize: 38, fontWeight: 900, color: "#1E2A22",
+            fontSize: 38, fontWeight: 900, color: "#1C2E24",
             letterSpacing: "-1px", lineHeight: 1.15,
           }}>
             나의 씻기<br/>루틴
@@ -78,7 +78,7 @@ export default function SetupPage() {
                 <div className="flex-shrink-0 flex items-center justify-center"
                   style={{
                     width: 44, height: 44, borderRadius: "50%",
-                    background: "linear-gradient(180deg,#3FA96B 0%,#2E8C56 100%)",
+                    background: "linear-gradient(180deg,#4D7A56 0%,#1C3A2B 100%)",
                   }}>
                   <span style={{ fontSize: 18, fontWeight: 800, color: "#FFFFFF" }}>{i + 1}</span>
                 </div>
@@ -110,8 +110,8 @@ export default function SetupPage() {
             style={{
               height: 56,
               borderRadius: 999,
-              background: "linear-gradient(180deg,#4CBE7C 0%,#2E8C56 100%)",
-              boxShadow: "0 8px 20px rgba(46,140,86,0.35)",
+              background: "linear-gradient(180deg,#4D7A56 0%,#1C3A2B 100%)",
+              boxShadow: "0 8px 20px rgba(28,58,43,0.35)",
               fontSize: 17,
               letterSpacing: "0.02em",
               border: "none",
@@ -154,13 +154,13 @@ export default function SetupPage() {
 
   return (
     <div className="flex flex-col min-h-dvh"
-      style={{ background: "linear-gradient(180deg,#EAF7EE 0%,#D8F0E0 45%,#C7ECD9 100%)" }}>
+      style={{ background: "linear-gradient(180deg,#F5F5F0 0%,#ECEEE8 45%,#E0E4D8 100%)" }}>
 
       {/* 진행 바 */}
       <div className="flex gap-2 px-5 pt-14 pb-0">
         {[0,1,2,3].map(i => (
           <div key={i} className="h-1.5 flex-1 rounded-full transition-all duration-300"
-            style={{ background: i < step ? "#3FA96B" : "#9FE0B8" }} />
+            style={{ background: i < step ? "#4D7A56" : "#C8CEC4" }} />
         ))}
       </div>
 
@@ -168,10 +168,10 @@ export default function SetupPage() {
         <Kaechi mood="question" size={140} />
 
         <div className="text-center">
-          <p className="text-xs font-bold tracking-widest mb-1.5" style={{ color: "#3FA96B" }}>
+          <p className="text-xs font-bold tracking-widest mb-1.5" style={{ color: "#4D7A56" }}>
             {STEP_LABELS[step]}
           </p>
-          <p className="font-bold leading-snug" style={{ fontSize: 20, color: "#1E2A22" }}>
+          <p className="font-bold leading-snug" style={{ fontSize: 20, color: "#1C2E24" }}>
             {STEP_QUESTIONS[step]}
           </p>
         </div>
@@ -186,9 +186,9 @@ export default function SetupPage() {
                   <span className="flex flex-col items-center gap-0.5">
                     <Image src={WASH_CHAR[id]} alt={el.label}
                       width={36} height={36} style={{ objectFit: "contain" }} />
-                    <span className="text-[10px] font-bold" style={{ color: "#5C6B60" }}>{el.label}</span>
+                    <span className="text-[10px] font-bold" style={{ color: "#4D6B5A" }}>{el.label}</span>
                   </span>
-                  <span style={{ color: "#3FA96B", fontSize: 14 }}>→</span>
+                  <span style={{ color: "#4D7A56", fontSize: 14 }}>→</span>
                 </span>
               );
             })}

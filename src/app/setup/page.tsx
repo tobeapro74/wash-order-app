@@ -87,7 +87,7 @@ export default function SetupPage() {
             씻기 순서 설정
           </p>
           <p style={{ fontSize: 13, color: "#4D6B5A", marginBottom: 28 }}>
-            나만의 순서를 정해보세요
+            {isNewSetup ? "나만의 순서를 정해보세요" : "나만의 순서를 확인하세요"}
           </p>
 
           {/* 순서 pill 리스트 */}
@@ -98,10 +98,16 @@ export default function SetupPage() {
                 <div key={id} style={{
                   background: "#E0E8DC",
                   borderRadius: 999,
-                  padding: "12px 20px",
-                  fontSize: 15, fontWeight: 600, color: "#1C2E24",
+                  padding: "13px 24px",
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
                 }}>
-                  {i + 1}순위 {el.label}
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#6B8F78", minWidth: 56 }}>
+                    {i + 1}순위
+                  </span>
+                  <span style={{ fontSize: 16, fontWeight: 800, color: "#1C2E24", flex: 1, textAlign: "center" }}>
+                    {el.label}
+                  </span>
+                  <span style={{ minWidth: 56 }} />
                 </div>
               );
             })}

@@ -61,9 +61,9 @@ export default function BuildingPage() {
   const total   = ranking.length;
   const myFloor = ranking.findIndex(r => orderKey(r.order) === myKey) + 1 || 0;
 
-  // 엘리베이터 목표 bottom px 계산
-  // 창문 중앙 svgY = 18 + (total-floor)*FLOOR_H + FLOOR_H*0.5 (창문offset 0.225 + wh/2 ≈ 0.5)
-  // CSS bottom = (600 - svgY) / 600 * H - ELEV_HALF
+  // SVG preserveAspectRatio="none" → SVG픽셀 = wrapRef픽셀 (1:1 스케일)
+  // 창문 중앙 svgY = 18 + (total-floor)*FLOOR_H + FLOOR_H*0.5
+  // CSS bottom = (600 - svgY) / 600 * H - ELEV_HALF  (엘베 center 정렬)
   const targetBotPx = useCallback((floor: number) => {
     const H = wrapH || (wrapRef.current?.offsetHeight ?? 500);
     const FLOOR_H = 582 / Math.max(total, 1);
@@ -395,7 +395,7 @@ function BuildingSvg({ total, litFloor }: { total: number; litFloor: number }) {
   }
 
   return (
-    <svg viewBox="0 0 200 600" width="100%" style={{ position: "absolute", bottom: 0, left: 0, zIndex: 3, width: "100%" }}>
+    <svg viewBox="0 0 200 600" width="100%" height="100%" preserveAspectRatio="none" style={{ position: "absolute", bottom: 0, left: 0, zIndex: 3, width: "100%", height: "100%" }}>
       <defs>
         <linearGradient id="bg1" x1="0" x2="1" y1="0" y2="0">
           <stop offset="0%" stopColor="#1C3A2B"/>

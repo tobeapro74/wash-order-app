@@ -1,341 +1,439 @@
 "use client";
 
-// ❌ 절대 금지: 풀와이드 rounded-rect 리스트 / 모든 층 동일 폭 / 스카이라운지 풀와이드 바
-// ✅ 필수: 층마다 폭이 다른 사다리꼴 타워 / 중심축 정렬 / 스카이라운지 독립 골드 큐브
-
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   ElementId, loadMyOrder, loadScores, getRanking, orderKey, WASH_ELEMENTS,
 } from "@/lib/wash";
 import { apiGetRankings } from "@/lib/api";
-import { Kaechi, WASH_CHAR } from "@/components/Kaechi";
 import { BottomNav } from "@/components/BottomNav";
 import { useAuth } from "@/hooks/useAuth";
-import Image from "next/image";
 
-// 층별 블록 폭: 상층(23층)이 230px, 내려갈수록 6px씩 넓어짐
-// 최상층=화면폭의 55%, 최하층=화면폭의 90% 사이를 균등 분배
-// 화면폭은 320~430px 사이로 클램프 (모바일 기준)
-function widthForFloor(floor: number, topFloor: number): number {
-  // 앱 컨테이너는 최대 480px — 그 이상은 480으로 클램프
-  const containerW = typeof window !== "undefined"
-    ? Math.min(window.innerWidth, 480)
-    : 375;
-  const vw = Math.min(Math.max(containerW, 320), 480);
-  const minW = Math.round(vw * 0.55);
-  const maxW = Math.round(vw * 0.90);
-  if (topFloor <= 1) return minW;
-  return Math.round(minW + ((topFloor - floor) / (topFloor - 1)) * (maxW - minW));
+type RankItem = { order: ElementId[]; score: number; likes: number; dislikes: number };
+
+function labelOf(id: ElementId) {
+  return WASH_ELEMENTS.find(e => e.id === id)?.label ?? id;
 }
-
-// 순서 전체 확대 모달
-function OrderZoomModal({ order, onClose }: { order: ElementId[]; onClose: () => void }) {
-  return (
-    <div
-      onClick={onClose}
-      style={{
-        position: "fixed", inset: 0, zIndex: 100,
-        background: "rgba(0,0,0,0.45)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        padding: "0 24px",
-      }}>
-      <div
-        onClick={e => e.stopPropagation()}
-        style={{
-          width: "100%", maxWidth: 360,
-          background: "linear-gradient(180deg,#EAF7EE 0%,#D8F0E0 100%)",
-          borderRadius: 28,
-          padding: "32px 24px 24px",
-          display: "flex", flexDirection: "column", alignItems: "center", gap: 20,
-          boxShadow: "0 16px 48px rgba(0,0,0,0.22)",
-        }}>
-        <p style={{ fontSize: 15, fontWeight: 800, color: "#1F6E42", margin: 0 }}>씻기 순서</p>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
-          {order.map((id, i) => {
-            const el = WASH_ELEMENTS.find(e => e.id === id)!;
-            return (
-              <span key={id} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                  <Image src={WASH_CHAR[id]} alt={el.label}
-                    width={72} height={72} style={{ objectFit: "contain" }} />
-                  <span style={{ fontSize: 13, fontWeight: 700, color: "#1E2A22" }}>{el.label}</span>
-                </span>
-                {i < order.length - 1 &&
-                  <span style={{ color: "#3FA96B", fontSize: 18, fontWeight: 700 }}>→</span>}
-              </span>
-            );
-          })}
-        </div>
-        <button onClick={onClose} style={{
-          fontSize: 13, color: "#5C6B60",
-          background: "none", border: "none", cursor: "pointer",
-        }}>닫기</button>
-      </div>
-    </div>
-  );
+function emojiOf(id: ElementId) {
+  const map: Record<ElementId, string> = { face: "🙂", hair: "💆", body: "🚿", teeth: "🦷" };
+  return map[id] ?? "";
 }
 
 export default function BuildingPage() {
   const router = useRouter();
-  useAuth();  // 비로그인 시 /login 리다이렉트
-  const [myOrder,       setMyOrder]       = useState<ElementId[] | null>(null);
-  const [ranking,       setRanking]       = useState<{ order: ElementId[]; score: number; likes: number; dislikes: number }[]>([]);
-  const [selectedFloor, setSelectedFloor] = useState<number | null>(null);
-  const [zoomOrder,     setZoomOrder]     = useState<ElementId[] | null>(null);
-  const myFloorRef = useRef<HTMLDivElement>(null);
+  useAuth();
+
+  const [myOrder,  setMyOrder]  = useState<ElementId[] | null>(null);
+  const [ranking,  setRanking]  = useState<RankItem[]>([]);
+  const [popup,    setPopup]    = useState<{ floor: number; idx: number } | null>(null);
+  const [elevBot,  setElevBot]  = useState(0);   // px from bottom
+  const [moving,   setMoving]   = useState(false);
+  const [goingUp,  setGoingUp]  = useState(true);
+  const wrapRef      = useRef<HTMLDivElement>(null);
+  const panelRef     = useRef<HTMLDivElement>(null);
+  const autoRan      = useRef(false);
+  const currentFloor = useRef(0);
 
   useEffect(() => {
     const my = loadMyOrder();
     if (!my) { router.replace("/setup"); return; }
     setMyOrder(my);
     apiGetRankings()
-      .then(serverRankings => {
-        if (serverRankings.length > 0)
-          setRanking(serverRankings.map(r => ({ order: r.order as ElementId[], score: r.score, likes: r.likes ?? 0, dislikes: r.dislikes ?? 0 })));
+      .then(rows => {
+        if (rows.length > 0)
+          setRanking(rows.map(r => ({ order: r.order as ElementId[], score: r.score, likes: r.likes ?? 0, dislikes: r.dislikes ?? 0 })));
       })
       .catch(() => setRanking(getRanking(loadScores()).map(r => ({ ...r, likes: 0, dislikes: 0 }))));
   }, [router]);
 
-  useEffect(() => {
-    if (myFloorRef.current) {
-      myFloorRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-  }, [ranking]);
+  const myKey   = myOrder ? orderKey(myOrder) : "";
+  const total   = ranking.length;
+  const myFloor = ranking.findIndex(r => orderKey(r.order) === myKey) + 1 || 0;
 
-  const myKey = myOrder ? orderKey(myOrder) : "";
-  const total = ranking.length;
+  // 엘리베이터 목표 bottom px 계산
+  const targetBotPx = useCallback((floor: number) => {
+    const H = wrapRef.current?.offsetHeight ?? 500;
+    return Math.round(((floor - 0.5) / Math.max(total, 1)) * H);
+  }, [total]);
+
+  // 층 선택 → 엘리베이터 이동
+  const selectFloor = useCallback((floor: number, idx: number) => {
+    if (moving) return;
+    setGoingUp(floor >= currentFloor.current);
+    setMoving(true);
+    setPopup(null);
+    setElevBot(targetBotPx(floor));
+    setTimeout(() => {
+      currentFloor.current = floor;
+      setMoving(false);
+      setPopup({ floor, idx });
+      // 패널에서 해당 버튼으로 스크롤
+      const btn = panelRef.current?.querySelector(`[data-floor="${floor}"]`) as HTMLElement;
+      btn?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 2700);
+  }, [moving, targetBotPx]);
+
+  // 랭킹 로드 후 자동으로 내 층으로
+  useEffect(() => {
+    if (autoRan.current || total === 0 || myFloor === 0) return;
+    autoRan.current = true;
+    const myIdx = ranking.findIndex(r => orderKey(r.order) === myKey);
+    setTimeout(() => selectFloor(myFloor, myIdx), 600);
+  }, [total, myFloor, ranking, myKey, selectFloor]);
+
+  const TOTAL_FLOORS = total;
 
   return (
     <div style={{
-      minHeight: "100dvh",
+      height: "100dvh",
       display: "flex",
       flexDirection: "column",
-      background: "linear-gradient(180deg, #EAF7EE 0%, #D8F0E0 50%, #F7ECC9 100%)",
+      background: "#0B1629",
+      color: "#E8F4FF",
+      overflow: "hidden",
     }}>
 
-      {/* 타이틀 영역 */}
-      <div style={{ textAlign: "center", paddingTop: 56, paddingBottom: 16, flexShrink: 0 }}>
-        <h1 style={{
-          fontSize: 36, fontWeight: 900, letterSpacing: "-0.5px", lineHeight: 1.15,
-          background: "linear-gradient(180deg, #3FA96B 0%, #1F6E42 100%)",
-          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-        }}>
-          24층 씻기 빌딩
-        </h1>
-        <p style={{ fontSize: 14, color: "#5C6B60", marginTop: 4 }}>
-          24층 씻기 빌딩 점당 보드
-        </p>
+      {/* ── 헤더 ── */}
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "16px 20px 10px",
+        background: "linear-gradient(180deg,#0B1629 0%,transparent 100%)",
+        flexShrink: 0, zIndex: 10,
+      }}>
+        <div>
+          <div style={{
+            fontSize: 26, fontWeight: 900, letterSpacing: 1,
+            color: "#F5C84B",
+            textShadow: "0 0 20px rgba(245,200,75,0.4)",
+          }}>
+            🏢 씻기 빌딩
+          </div>
+          <div style={{ fontSize: 11, color: "#8BAFC8", letterSpacing: 1, marginTop: 2 }}>
+            24층 씻기 순위 보드
+          </div>
+        </div>
+        {myFloor > 0 && (
+          <div style={{
+            background: "#4CBE7C", color: "#fff",
+            fontSize: 12, fontWeight: 700,
+            padding: "6px 14px", borderRadius: 999,
+            boxShadow: "0 0 16px rgba(76,190,124,0.4)",
+          }}>
+            내 층: {myFloor}F
+          </div>
+        )}
       </div>
 
-      {/* 타워 스크롤 영역 */}
-      <div style={{ flex: 1, overflowY: "auto", paddingBottom: 100 }}>
+      {/* ── 메인 ── */}
+      <div style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
 
-        {/* 타워 전체를 중앙 정렬 컨테이너로 감쌈 */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "8px 0 16px" }}>
+        {/* 별 배경 */}
+        <Stars />
 
-          {/* ── 스카이라운지: 독립 골드 큐브 ── */}
-          <div style={{ position: "relative", width: 220 }}>
-            {/* 구름 좌우 */}
-            <div style={{ position: "absolute", top: -24, left: -60, fontSize: 32, opacity: 0.9 }}>☁️</div>
-            <div style={{ position: "absolute", top: -18, right: -60, fontSize: 28, opacity: 0.9 }}>☁️</div>
+        {/* ── 빌딩 ── */}
+        <div style={{ flex: 1, position: "relative", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 1 }}>
+          <div ref={wrapRef} style={{ position: "relative", width: 200, height: "100%" }}>
 
-            {/* 트로피 (블록 위로 튀어나옴) */}
-            <div style={{ textAlign: "center", marginBottom: -12, position: "relative", zIndex: 2 }}>
-              <span style={{ fontSize: 40, filter: "drop-shadow(0 2px 8px rgba(216,155,31,0.6))" }}>🏆</span>
-            </div>
-
-            {/* 골드 큐브 상면 */}
+            {/* 스카이라운지 뱃지 */}
             <div style={{
-              width: 220, height: 90,
-              background: "linear-gradient(180deg, #FCE18A 0%, #F5C84B 60%, #D89B1F 100%)",
-              borderRadius: 20,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              boxShadow: "0 0 0 1px rgba(255,255,255,0.4) inset, 0 6px 20px rgba(216,155,31,0.4)",
-              position: "relative", zIndex: 1,
+              position: "absolute", top: 8, left: "50%", transform: "translateX(-50%)",
+              background: "linear-gradient(135deg,#FCE18A,#F5C84B)",
+              color: "#1a1000", fontSize: 10, fontWeight: 900,
+              padding: "3px 12px", borderRadius: 999,
+              whiteSpace: "nowrap", zIndex: 10,
+              boxShadow: "0 0 16px rgba(245,200,75,0.5)",
+              letterSpacing: "0.5px",
             }}>
-              <span style={{ fontSize: 20, fontWeight: 900, color: "white",
-                textShadow: "0 1px 4px rgba(0,0,0,0.25)" }}>
-                스카이라운지
-              </span>
+              🏆 스카이라운지
             </div>
 
-            {/* 큐브 측면(줄눈) */}
+            {/* 빌딩 SVG */}
+            <BuildingSvg total={TOTAL_FLOORS} myFloor={myFloor} />
+
+            {/* 엘리베이터 */}
             <div style={{
-              width: 220, height: 10,
-              background: "linear-gradient(180deg, #C89010 0%, #A07000 100%)",
-              borderRadius: "0 0 10px 10px",
-              boxShadow: "0 6px 12px rgba(180,110,0,0.35)",
-            }} />
-          </div>
+              position: "absolute",
+              left: "50%",
+              transform: "translateX(-50%)",
+              bottom: elevBot,
+              width: 28, height: 28,
+              zIndex: 25,
+              transition: "bottom 2.4s cubic-bezier(0.4,0,0.2,1)",
+              filter: "drop-shadow(0 0 8px rgba(245,200,75,0.8))",
+            }}>
+              <svg viewBox="0 0 28 28" width="28" height="28">
+                <rect x="1" y="1" width="26" height="26" rx="5" fill="#F5C84B" stroke="#D89B1F" strokeWidth="1.5"/>
+                <rect x="4" y="5" width="8" height="16" rx="2" fill="rgba(255,255,255,0.6)"/>
+                <rect x="16" y="5" width="8" height="16" rx="2" fill="rgba(255,255,255,0.6)"/>
+                <circle cx="14" cy="13" r="2" fill="#D89B1F"/>
+              </svg>
+            </div>
 
-          {/* ── 일반 층 블록들 ── */}
-          {Array.from({ length: total }, (_, i) => {
-            const floor    = total - i;
-            const rankIdx  = total - floor;
-            const item     = ranking[rankIdx];
-            if (!item) return null;
-
-            const isMine     = orderKey(item.order) === myKey;
-            const isTop      = floor === total;
-            const isSelected = selectedFloor === floor;
-            const w          = widthForFloor(floor, total);  // px 단위 고정폭
-            const blockH     = isMine ? 76 : 60;
-
-            return (
-              <div key={orderKey(item.order)}
-                ref={isMine ? myFloorRef : null}
-                style={{ position: "relative", width: w }}>
-
-                {/* 내 층 캐릭터: 블록 우측 바깥에 absolute */}
-                {isMine && (
-                  <div style={{
-                    position: "absolute",
-                    right: -64,
-                    bottom: 10,
-                    zIndex: 10,
-                    width: 56, height: 56,
-                  }}>
-                    <Kaechi mood="mini" size={56} animate={false} />
-                  </div>
-                )}
-
-                <button
-                  onClick={() => setSelectedFloor(isSelected ? null : floor)}
-                  style={{ display: "block", width: "100%", background: "none", border: "none", padding: 0, cursor: "pointer" }}>
-
-                  {/* 블록 상면 */}
-                  <div style={{
-                    width: w,
-                    height: blockH,
-                    background: isMine
-                      ? "linear-gradient(180deg, #B8F5D0 0%, #9FE0B8 100%)"
-                      : isTop
-                      ? "linear-gradient(180deg, #FCE18A 0%, #F5C84B 100%)"
-                      : "linear-gradient(180deg, #C7ECD9 0%, #A8D8C0 100%)",
-                    borderRadius: 14,
-                    position: "relative",
-                    overflow: "visible",
-                    // 하이라이트: 상단 안쪽 밝은 줄
-                    boxShadow: isMine
-                      ? "0 0 0 2.5px #3FA96B, 0 0 0 5px rgba(63,169,107,0.25), 0 0 24px 6px rgba(63,169,107,0.55), 0 1px 0 rgba(255,255,255,0.6) inset"
-                      : "0 1px 0 rgba(255,255,255,0.55) inset, 0 2px 6px rgba(0,0,0,0.06)",
-                    display: "flex",
-                    alignItems: "center",
-                    paddingLeft: 16,
-                    paddingRight: 16,
-                  }}>
-
-                    {!isSelected && (
-                      <>
-                        {/* 층수 라벨 (좌측) */}
-                        <div style={{ flex: 1 }}>
-                          {isMine ? (
-                            <>
-                              <p style={{ fontSize: 20, fontWeight: 900, color: "#1F6E42", lineHeight: 1.1, margin: 0 }}>
-                                {floor}층
-                              </p>
-                              <p style={{ fontSize: 12, fontWeight: 700, color: "#3FA96B", margin: 0 }}>
-                                나의 층
-                              </p>
-                            </>
-                          ) : (
-                            <p style={{ fontSize: 15, fontWeight: 700, color: "#1E2A22", margin: 0 }}>
-                              {isTop ? "🌟" : `${floor}층`}
-                            </p>
-                          )}
-                        </div>
-
-                        {/* 좋아요/싫어요 pill (우측, 모든 층) */}
-                        <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                          <div style={{
-                            background: "rgba(255,255,255,0.88)",
-                            borderRadius: 999, padding: "4px 9px",
-                            display: "flex", alignItems: "center", gap: 3,
-                            boxShadow: "0 1px 6px rgba(0,0,0,0.10)",
-                          }}>
-                            <span style={{ fontSize: 12 }}>👍</span>
-                            <span style={{ fontSize: 13, fontWeight: 800, color: "#1F6E42" }}>
-                              {item.likes}
-                            </span>
-                          </div>
-                          <div style={{
-                            background: "rgba(255,255,255,0.88)",
-                            borderRadius: 999, padding: "4px 9px",
-                            display: "flex", alignItems: "center", gap: 3,
-                            boxShadow: "0 1px 6px rgba(0,0,0,0.10)",
-                          }}>
-                            <span style={{ fontSize: 12 }}>👎</span>
-                            <span style={{ fontSize: 13, fontWeight: 800, color: "#D9564A" }}>
-                              {item.dislikes}
-                            </span>
-                          </div>
-                        </div>
-                      </>
-                    )}
-
-                    {/* 선택됨: 씻기 순서 */}
-                    {isSelected && (
-                      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                        {item.order.map((id, j) => {
-                          const el = WASH_ELEMENTS.find(e => e.id === id)!;
-                          return (
-                            <span key={id} style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                              <button
-                                onClick={e => { e.stopPropagation(); setZoomOrder(item.order); }}
-                                style={{ background: "none", border: "none", padding: 0, cursor: "zoom-in" }}>
-                                <Image src={WASH_CHAR[id]} alt={el.label}
-                                  width={30} height={30} style={{ objectFit: "contain", display: "block" }} />
-                              </button>
-                              {j < item.order.length - 1 &&
-                                <span style={{ color: "#3FA96B", fontSize: 11 }}>→</span>}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* 블록 측면(줄눈) — 3D 입체감 */}
-                  <div style={{
-                    width: w,
-                    height: 10,
-                    background: isMine
-                      ? "linear-gradient(180deg, #2E8C56 0%, #1F6E42 100%)"
-                      : isTop
-                      ? "linear-gradient(180deg, #D89B1F 0%, #B07800 100%)"
-                      : "linear-gradient(180deg, #7BC4A0 0%, #5BAF7A 100%)",
-                    borderRadius: "0 0 8px 8px",
-                    boxShadow: "0 5px 10px rgba(0,0,0,0.13)",
-                  }} />
-                </button>
+            {moving && (
+              <div style={{
+                position: "absolute", top: "45%", left: "50%",
+                transform: "translate(-50%,-50%)",
+                fontSize: 12, color: "#F5C84B", fontWeight: 700,
+                whiteSpace: "nowrap", zIndex: 30,
+                textShadow: "0 0 10px rgba(245,200,75,0.6)",
+              }}>
+                {goingUp ? "⬆ 올라가는 중..." : "⬇ 내려가는 중..."}
               </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── 층 버튼 패널 ── */}
+        <div ref={panelRef} style={{
+          width: 172,
+          height: "100%",
+          overflowY: "auto",
+          overflowX: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          padding: "8px 10px 80px",
+          gap: 4,
+          flexShrink: 0,
+          zIndex: 5,
+          background: "linear-gradient(90deg,transparent 0%,rgba(11,22,41,0.6) 100%)",
+        }}>
+          {ranking.map((item, i) => {
+            const floor  = total - i;
+            const isMine = orderKey(item.order) === myKey;
+            const isAct  = popup?.floor === floor;
+            return (
+              <button
+                key={orderKey(item.order)}
+                data-floor={floor}
+                onClick={() => selectFloor(floor, i)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  padding: "7px 10px", borderRadius: 8,
+                  border: `1px solid ${isAct ? "#F5C84B" : isMine ? "#4CBE7C" : "transparent"}`,
+                  background: isAct
+                    ? "rgba(245,200,75,0.15)"
+                    : isMine
+                    ? "rgba(46,140,86,0.25)"
+                    : "rgba(30,58,95,0.4)",
+                  cursor: "pointer",
+                  color: "#E8F4FF",
+                  textAlign: "left",
+                  flexShrink: 0,
+                  transition: "all 0.2s",
+                  boxShadow: isMine ? "0 0 12px rgba(76,190,124,0.2)" : "none",
+                }}
+              >
+                <div style={{
+                  fontWeight: 900, fontSize: 17, lineHeight: 1,
+                  color: isAct ? "#F5C84B" : isMine ? "#4CBE7C" : "#F5C84B",
+                  minWidth: 30,
+                }}>
+                  {floor}F
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 9, color: "#8BAFC8", letterSpacing: 0.5 }}>
+                    {isMine ? "✦ 나의 층" : `${i+1}위`}
+                  </div>
+                  <div style={{ fontSize: 11, fontWeight: 600, color: "#E8F4FF", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {item.order.map(id => labelOf(id)).join("→")}
+                  </div>
+                </div>
+                <div style={{ fontSize: 10, color: "#8BAFC8", whiteSpace: "nowrap" }}>
+                  👍{item.likes}
+                </div>
+              </button>
             );
           })}
-
-          {/* 보일러실 */}
-          <div style={{ marginTop: 4 }}>
-            <span style={{
-              display: "inline-block",
-              background: "#D8F0E0", borderRadius: 20,
-              padding: "6px 20px", fontSize: 12, fontWeight: 700, color: "#5C6B60",
-              border: "2px solid #9FE0B8",
-            }}>
-              🔧 보일러실 (꼴찌)
-            </span>
-          </div>
-
-          <p style={{ fontSize: 12, color: "#5C6B60", lineHeight: 1.6, textAlign: "center", padding: "0 24px" }}>
-            블록을 누르면 씻기 순서를 볼 수 있어요 🐥<br/>
-            내 순서가 24층에 도달하면 스카이라운지 입장!
-          </p>
         </div>
+
+        {/* ── 결과 팝업 ── */}
+        {popup && (
+          <div style={{
+            position: "absolute",
+            bottom: 80,
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "rgba(17,34,64,0.97)",
+            border: "1px solid rgba(245,200,75,0.4)",
+            borderRadius: 20,
+            padding: "18px 22px",
+            minWidth: 220,
+            maxWidth: 280,
+            zIndex: 50,
+            boxShadow: "0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(245,200,75,0.2)",
+            textAlign: "center",
+            animation: "fadeUp 0.3s ease",
+          }}>
+            <div style={{ fontWeight: 900, fontSize: 34, color: "#F5C84B", lineHeight: 1, textShadow: "0 0 16px rgba(245,200,75,0.5)" }}>
+              {popup.floor}F
+            </div>
+            {ranking[ranking.length - popup.floor] && orderKey(ranking[ranking.length - popup.floor].order) === myKey && (
+              <div style={{
+                display: "inline-block", background: "#4CBE7C", color: "#fff",
+                fontSize: 10, fontWeight: 700, padding: "2px 10px",
+                borderRadius: 999, margin: "4px 0 8px", letterSpacing: 0.5,
+              }}>
+                ✦ 나의 씻기 순서
+              </div>
+            )}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, flexWrap: "wrap", margin: "10px 0" }}>
+              {ranking[ranking.findIndex((_, i) => total - i === popup.floor)]?.order.map((id, j) => (
+                <span key={id} style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  {j > 0 && <span style={{ color: "#8BAFC8", fontSize: 11 }}>→</span>}
+                  <span style={{
+                    background: j === 0 ? "rgba(245,200,75,0.2)" : "rgba(123,184,212,0.15)",
+                    border: `1px solid ${j === 0 ? "#F5C84B" : "rgba(123,184,212,0.3)"}`,
+                    borderRadius: 999,
+                    padding: "5px 12px",
+                    fontSize: 13, fontWeight: 700,
+                    color: j === 0 ? "#F5C84B" : "#E8F4FF",
+                  }}>
+                    {emojiOf(id)} {labelOf(id)}
+                  </span>
+                </span>
+              ))}
+            </div>
+            <div style={{ fontSize: 11, color: "#8BAFC8", marginBottom: 10 }}>
+              👍 {ranking[ranking.findIndex((_, i) => total - i === popup.floor)]?.likes ?? 0}점
+            </div>
+            <button
+              onClick={() => setPopup(null)}
+              style={{
+                background: "none", border: "1px solid rgba(123,184,212,0.3)",
+                color: "#8BAFC8", fontSize: 11, padding: "5px 18px",
+                borderRadius: 999, cursor: "pointer",
+              }}
+            >
+              닫기
+            </button>
+          </div>
+        )}
       </div>
 
       <BottomNav />
 
-      {/* 캐릭터 확대 모달 */}
-      {zoomOrder && <OrderZoomModal order={zoomOrder} onClose={() => setZoomOrder(null)} />}
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+      `}</style>
     </div>
+  );
+}
+
+/* ── 별 배경 ── */
+function Stars() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const c = canvasRef.current;
+    if (!c) return;
+    const ctx = c.getContext("2d")!;
+    const draw = () => {
+      c.width = c.offsetWidth;
+      c.height = c.offsetHeight;
+      ctx.clearRect(0, 0, c.width, c.height);
+      for (let i = 0; i < 100; i++) {
+        const x = Math.random() * c.width;
+        const y = Math.random() * c.height * 0.65;
+        const r = Math.random() * 1.2;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(232,244,255,${0.3 + Math.random() * 0.6})`;
+        ctx.fill();
+      }
+    };
+    draw();
+    window.addEventListener("resize", draw);
+    return () => window.removeEventListener("resize", draw);
+  }, []);
+  return (
+    <canvas ref={canvasRef} style={{
+      position: "absolute", inset: 0,
+      width: "100%", height: "100%",
+      pointerEvents: "none", zIndex: 0,
+    }} />
+  );
+}
+
+/* ── 빌딩 SVG ── */
+function BuildingSvg({ total, myFloor }: { total: number; myFloor: number }) {
+  const FLOOR_H = total > 0 ? 580 / total : 24;
+  const wins: { x: number; y: number; w: number; h: number; lit: boolean }[] = [];
+  const lines: { y: number }[] = [];
+
+  for (let f = 0; f < total; f++) {
+    const floor = total - f;
+    const y = 600 - (f + 1) * FLOOR_H;
+    const lit = floor === myFloor;
+    const wh = Math.max(FLOOR_H * 0.55, 4);
+    wins.push({ x: 44, y: y + FLOOR_H * 0.2, w: 16, h: wh, lit });
+    wins.push({ x: 140, y: y + FLOOR_H * 0.2, w: 16, h: wh, lit });
+    lines.push({ y: y + FLOOR_H });
+  }
+
+  return (
+    <svg viewBox="0 0 200 600" width="200" style={{ position: "absolute", bottom: 0, left: 0, zIndex: 3 }}>
+      <defs>
+        <linearGradient id="bg1" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0%" stopColor="#1E3A5F"/>
+          <stop offset="50%" stopColor="#2A4A6B"/>
+          <stop offset="100%" stopColor="#152E50"/>
+        </linearGradient>
+        <linearGradient id="bg2" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0%" stopColor="#152E50"/>
+          <stop offset="50%" stopColor="#1E3A5F"/>
+          <stop offset="100%" stopColor="#0E2040"/>
+        </linearGradient>
+        <linearGradient id="shaft" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0%" stopColor="#0a1825"/>
+          <stop offset="50%" stopColor="#1a2f45"/>
+          <stop offset="100%" stopColor="#0a1825"/>
+        </linearGradient>
+        <linearGradient id="ant" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#8BAFC8"/>
+          <stop offset="100%" stopColor="#2A4A6B"/>
+        </linearGradient>
+      </defs>
+
+      {/* 왼쪽 타워 */}
+      <polygon points="20,600 20,80 88,18 88,600" fill="url(#bg1)"/>
+      {/* 오른쪽 타워 */}
+      <polygon points="112,18 112,600 180,80 180,600" fill="url(#bg2)"/>
+
+      {/* 창문 */}
+      {wins.map((w, i) => (
+        <rect key={i} x={w.x} y={w.y} width={w.w} height={w.h} rx="2"
+          fill={w.lit ? "#FFEAA0" : "#7BB8D4"}
+          opacity={w.lit ? 0.9 : 0.45}/>
+      ))}
+
+      {/* 층 구분선 */}
+      {lines.map((l, i) => (
+        <g key={i} stroke="rgba(11,22,41,0.5)" strokeWidth="0.8">
+          <line x1="20" x2="87" y1={l.y} y2={l.y}/>
+          <line x1="113" x2="180" y1={l.y} y2={l.y}/>
+        </g>
+      ))}
+
+      {/* 중앙 샤프트 */}
+      <rect x="88" y="18" width="24" height="582" fill="url(#shaft)"/>
+      <line x1="94" y1="18" x2="94" y2="600" stroke="#1a3050" strokeWidth="1.2"/>
+      <line x1="106" y1="18" x2="106" y2="600" stroke="#1a3050" strokeWidth="1.2"/>
+
+      {/* 꼭대기 연결 */}
+      <polygon points="88,18 100,6 112,18" fill="#2A4A6B"/>
+
+      {/* 안테나 */}
+      <line x1="54" y1="80" x2="54" y2="0" stroke="url(#ant)" strokeWidth="1.8"/>
+      <circle cx="54" cy="0" r="2" fill="#F5C84B"/>
+      <line x1="146" y1="80" x2="146" y2="0" stroke="url(#ant)" strokeWidth="1.8"/>
+      <circle cx="146" cy="0" r="2" fill="#F5C84B"/>
+      <line x1="100" y1="6" x2="100" y2="-24" stroke="#8BAFC8" strokeWidth="2"/>
+      <circle cx="100" cy="-26" r="2.5" fill="#F5C84B"/>
+
+      {/* 지면 */}
+      <rect x="10" y="596" width="180" height="8" rx="2" fill="#0a1825"/>
+    </svg>
   );
 }

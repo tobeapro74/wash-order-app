@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ElementId, loadMyOrder, loadScores, getRanking, orderKey, WASH_ELEMENTS,
+  ElementId, loadMyOrder, loadScores, getRanking, orderKey, WASH_ELEMENTS, getTodayOrder,
 } from "@/lib/wash";
 import { apiGetRankings } from "@/lib/api";
 import { BottomNav } from "@/components/BottomNav";
@@ -88,12 +88,17 @@ export default function BuildingPage() {
     }, 2700);
   }, [moving, targetBotPx]);
 
-  // 랭킹 로드 후 자동으로 내 층으로
+  // 랭킹 로드 후: 오늘 룰렛 결과 층으로 자동 이동
   useEffect(() => {
-    if (autoRan.current || total === 0 || myFloor === 0) return;
+    if (autoRan.current || total === 0) return;
     autoRan.current = true;
-    const myIdx = ranking.findIndex(r => orderKey(r.order) === myKey);
-    setTimeout(() => selectFloor(myFloor, myIdx), 600);
+    const todayOrder = getTodayOrder();
+    const todayKey = orderKey(todayOrder);
+    const todayIdx = ranking.findIndex(r => orderKey(r.order) === todayKey);
+    const todayFloor = todayIdx >= 0 ? total - todayIdx : 0;
+    const targetFloor = todayFloor > 0 ? todayFloor : (myFloor > 0 ? myFloor : 1);
+    const targetIdx   = todayFloor > 0 ? todayIdx   : ranking.findIndex(r => orderKey(r.order) === myKey);
+    setTimeout(() => selectFloor(targetFloor, targetIdx), 600);
   }, [total, myFloor, ranking, myKey, selectFloor]);
 
   const TOTAL_FLOORS = total;
@@ -128,13 +133,20 @@ export default function BuildingPage() {
           </div>
         </div>
         {myFloor > 0 && (
-          <div style={{
-            background: "#1C3A2B", color: "#B5E550",
-            fontSize: 12, fontWeight: 700,
-            padding: "6px 14px", borderRadius: 999,
-            boxShadow: "0 0 16px rgba(181,229,80,0.3)",
-            border: "1px solid rgba(181,229,80,0.3)",
-          }}>
+          <div
+            onClick={() => {
+              const myIdx = ranking.findIndex(r => orderKey(r.order) === myKey);
+              selectFloor(myFloor, myIdx);
+            }}
+            style={{
+              background: "#1C3A2B", color: "#B5E550",
+              fontSize: 12, fontWeight: 700,
+              padding: "6px 14px", borderRadius: 999,
+              boxShadow: "0 0 16px rgba(181,229,80,0.3)",
+              border: "1px solid rgba(181,229,80,0.3)",
+              cursor: "pointer",
+            }}
+          >
             내 층: {myFloor}F
           </div>
         )}

@@ -134,19 +134,19 @@ export default function TodayPage() {
     if (joker) setShowConfetti(true);
   };
 
-  const handleLike = () => {
+  const handleLike = async () => {
     if (!resultOrder) return;
     vote(resultOrder, true);
     markVotedToday();
-    apiVote(orderKey(resultOrder), true);
+    await apiVote(orderKey(resultOrder), true);
     setPhase("voted");
   };
 
-  const handleDislikeConfirm = () => {
+  const handleDislikeConfirm = async () => {
     if (!resultOrder) return;
     vote(resultOrder, false);
     markVotedToday();
-    apiVote(orderKey(resultOrder), false);
+    await apiVote(orderKey(resultOrder), false);
     setShowDislike(false);
     setPhase("voted");
   };

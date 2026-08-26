@@ -299,7 +299,7 @@ export default function BuildingPage() {
             <div style={{ fontWeight: 900, fontSize: 34, color: "#F5C84B", lineHeight: 1, textShadow: "0 0 16px rgba(245,200,75,0.5)" }}>
               {popup.floor}F
             </div>
-            {ranking[ranking.length - popup.floor] && orderKey(ranking[ranking.length - popup.floor].order) === myKey && (
+            {ranking[popup.idx] && orderKey(ranking[popup.idx].order) === myKey && (
               <div style={{
                 display: "inline-block", background: "#4CBE7C", color: "#fff",
                 fontSize: 10, fontWeight: 700, padding: "2px 10px",
@@ -309,7 +309,7 @@ export default function BuildingPage() {
               </div>
             )}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, flexWrap: "wrap", margin: "10px 0" }}>
-              {ranking[ranking.findIndex((_, i) => total - i === popup.floor)]?.order.map((id, j) => (
+              {ranking[popup.idx]?.order.map((id, j) => (
                 <span key={id} style={{ display: "flex", alignItems: "center", gap: 4 }}>
                   {j > 0 && <span style={{ color: "#8BAFC8", fontSize: 11 }}>→</span>}
                   <span style={{
@@ -326,8 +326,8 @@ export default function BuildingPage() {
               ))}
             </div>
             <div style={{ fontSize: 11, color: "#8BAFC8", marginBottom: 10, display: "flex", gap: 12, justifyContent: "center" }}>
-              <span>👍 {ranking[ranking.findIndex((_, i) => total - i === popup.floor)]?.likes ?? 0}</span>
-              <span>👎 {ranking[ranking.findIndex((_, i) => total - i === popup.floor)]?.dislikes ?? 0}</span>
+              <span>👍 {ranking[popup.idx]?.likes ?? 0}</span>
+              <span>👎 {ranking[popup.idx]?.dislikes ?? 0}</span>
             </div>
             <button
               onClick={() => setPopup(null)}
